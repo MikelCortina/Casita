@@ -13,11 +13,11 @@
 /**
  * 
  */
-class CASITA_API MyBranchPlayer : public APawn
+class CASITA_API AMyBranchPlayer : public APawn
 {
 public:
-	MyBranchPlayer();
-	~MyBranchPlayer();
+	AMyBranchPlayer();
+	~AMyBranchPlayer();
 
 protected:
     virtual void BeginPlay() override;

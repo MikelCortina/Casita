@@ -3,24 +3,24 @@
 
 #include "MyBranchPlayer.h"
 
-MyBranchPlayer::MyBranchPlayer()
+AMyBranchPlayer::MyBranchPlayer()
 {
     PrimaryActorTick.bCanEverTick = true;
     BranchSpline = CreateDefaultSubobject<USplineComponent>(TEXT("BranchSpline"));
     RootComponent = BranchSpline;
 }
 
-MyBranchPlayer::~MyBranchPlayer()
+AMyBranchPlayer::~MyBranchPlayer()
 {
 }
 
-void MyBranchPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AMyBranchPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     PlayerInputComponent->BindAxis("MoveForward", this, &AMyBranchPlayer::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMyBranchPlayer::MoveRight);
 }
 
-void MyBranchPlayer::Tick(float DeltaTime)
+void AMyBranchPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
