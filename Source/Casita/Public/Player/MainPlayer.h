@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "P_Player.generated.h"
+#include "MainPlayer.generated.h"
 
 UCLASS()
-class CASITA_API AP_Player : public APawn
+class CASITA_API AMainPlayer : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	AP_Player();
+	AMainPlayer();
 
 protected:
 	// Called when the game starts or when spawned
