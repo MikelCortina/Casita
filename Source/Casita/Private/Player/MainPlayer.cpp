@@ -2,6 +2,9 @@
 
 
 #include "Player/MainPlayer.h"
+#include "Components/ParticulasComponent.h"
+#include "Components/InputComponent.h"
+
 
 // Sets default values
 AMainPlayer::AMainPlayer()
@@ -9,6 +12,7 @@ AMainPlayer::AMainPlayer()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ParticulasComponent = CreateDefaultSubobject<UParticulasComponent>(TEXT("ParticulasComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -30,5 +34,13 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::ActivateParticles);
 }
 
+void AMainPlayer::ActivateParticles()
+{
+	if (ParticulasComponent)
+	{
+		ParticulasComponent->SpawnParticles();
+	}
+}

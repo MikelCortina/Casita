@@ -7,11 +7,7 @@
 // Sets default values for this component's properties
 UParticulasComponent::UParticulasComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false; // No usamos Tick
 }
 
 
@@ -26,7 +22,7 @@ void UParticulasComponent::BeginPlay()
 
 
 // Called every frame
-void UParticulasComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UParticulasComponent::SpawnParticles()
 {
 	if (!ParticleSystem) return;
 

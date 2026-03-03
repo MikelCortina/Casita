@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include "NiagaraSystem.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "NiagaraSystem.h"
 #include "ParticulasComponent.generated.h"
 
+class UNiagaraSystem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CASITA_API UParticulasComponent : public UActorComponent
@@ -22,9 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	UPROPERTY(EditAnywhere, Category="Effects")
 	UNiagaraSystem* ParticleSystem;
 

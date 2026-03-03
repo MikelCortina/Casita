@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "MainPlayer.generated.h"
 
+class UParticulasComponent;
+
 UCLASS()
 class CASITA_API AMainPlayer : public APawn
 {
@@ -26,4 +28,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	// Aquí puedes agregar componentes, variables y funciones privadas para tu jugador
+	UPROPERTY(VisibleAnywhere)
+	UParticulasComponent* ParticulasComponent;
+
+	void ActivateParticles();
 };
