@@ -1,99 +1,83 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
+
 
 #include "Interactuables/Portal.h"
 #include "Components/BoxComponent.h"
 
+// Sets default values
 APortal::APortal()
 {
-    PrimaryActorTick.bCanEverTick = true;
+        PrimaryActorTick.bCanEverTick = true;
 
-    SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("EsteEsNuestroRoot"));
-    RootComponent = SceneComponent;
+        SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("EsteEsNuestroRoot"));
+        RootComponent = SceneComponent;
 
-    PortalBoxA = CreateDefaultSubobject<UBoxComponent>(TEXT("PortalBoxA"));
-    PortalBoxB = CreateDefaultSubobject<UBoxComponent>(TEXT("PortalBoxB"));
+        PortalBoxA = CreateDefaultSubobject<UBoxComponent>(TEXT("PortalBoxA"));
+        PortalBoxB = CreateDefaultSubobject<UBoxComponent>(TEXT("PortalBoxB"));
 
-    PortalBoxA->SetupAttachment(RootComponent);
-    PortalBoxB->SetupAttachment(RootComponent);
+        PortalBoxA->SetupAttachment(RootComponent);
+        PortalBoxB->SetupAttachment(RootComponent);
 
-    // Dimensiones básicas (ajusta si quieres)
-    PortalBoxA->SetBoxExtent(FVector(50.f, 50.f, 100.f));
-    PortalBoxB->SetBoxExtent(FVector(50.f, 50.f, 100.f));
+        // Hacer que generen overlaps
+        PortalBoxA->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        PortalBoxA->SetCollisionResponseToAllChannels(ECR_Overlap);
 
-    // Overlap configurado
-    PortalBoxA->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    PortalBoxA->SetCollisionResponseToAllChannels(ECR_Overlap);
-    PortalBoxA->SetGenerateOverlapEvents(true);
-
-    PortalBoxB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    PortalBoxB->SetCollisionResponseToAllChannels(ECR_Overlap);
-    PortalBoxB->SetGenerateOverlapEvents(true);
+        PortalBoxB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+        PortalBoxB->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
+// Called when the game starts or when spawned
 void APortal::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (PortalBoxA)
-    {
-        PortalBoxA->OnComponentBeginOverlap.AddDynamic(this, &APortal::OnPortalOverlapA);
-    }
-    if (PortalBoxB)
-    {
-        PortalBoxB->OnComponentBeginOverlap.AddDynamic(this, &APortal::OnPortalOverlapB);
-    }
+    PortalBoxA->OnComponentBeginOverlap.AddDynamic(this, &APortal::OnPortalOverlapA);
+    PortalBoxB->OnComponentBeginOverlap.AddDynamic(this, &APortal::OnPortalOverlapB);
 }
 
+// Called every frame
 void APortal::Tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-
+	Super::Tick(DeltaTime);
 
 }
-
-void APortal::ReEnablePortal()
+bool APortal::CanTeleport(AActor* Actor) const
 {
-	PortalBoxA->SetGenerateOverlapEvents(true);
-	PortalBoxB->SetGenerateOverlapEvents(true);
+    if (Cooldowns.Contains(Actor))
+    {
+        float Current = GetWorld()->GetTimeSeconds();
+        return Current > Cooldowns[Actor];
+    }
+    return true;
 }
 
+void APortal::PutInCooldown(AActor* Actor)
+{
+    if (!Actor) return;
 
-
-void APortal::OnPortalOverlapA(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    float Current = GetWorld()->GetTimeSeconds();
+    Cooldowns.Add(Actor, Current + CooldownTime);
+}
+void APortal::OnPortalOverlapA(
+    UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
     bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor->IsA(APawn::StaticClass()))
-    {
-         // Deshabilitar temporalmente el portal para evitar "ping-pong"
-         PortalBoxA->SetGenerateOverlapEvents(false);
-         PortalBoxB->SetGenerateOverlapEvents(false);
-        // Aquí puedes implementar la lógica para teletransportar al jugador a través del portal
-         // Por ejemplo, podrías cambiar la ubicación del jugador al otro portal
-         FVector NewLocation = PortalBoxB->GetComponentLocation(); // Ajusta la posición según sea necesario
-         OtherActor->TeleportTo(NewLocation, GetActorRotation());
-		 GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APortal::ReEnablePortal, CooldownTime, false);
-    }
-          
-    
-}
+    if (!OtherActor || OtherActor == this) return;
+    if (!CanTeleport(OtherActor)) return;
 
-void APortal::OnPortalOverlapB(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    OtherActor->SetActorLocation(PortalBoxB->GetComponentLocation());
+    PutInCooldown(OtherActor);
+}
+void APortal::OnPortalOverlapB(
+    UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
     bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor->IsA(APawn::StaticClass()))
-    {
-        // Deshabilitar temporalmente el portal para evitar "ping-pong"
-        PortalBoxA->SetGenerateOverlapEvents(false);
-        PortalBoxB->SetGenerateOverlapEvents(false);
-        // Aquí puedes implementar la lógica para teletransportar al jugador a través del portal
-         // Por ejemplo, podrías cambiar la ubicación del jugador al otro portal
-        FVector NewLocation = PortalBoxA->GetComponentLocation(); // Ajusta la posición según sea necesario
-        OtherActor->TeleportTo(NewLocation, GetActorRotation());
+    if (!OtherActor || OtherActor == this) return;
+    if (!CanTeleport(OtherActor)) return;
 
-        GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APortal::ReEnablePortal, CooldownTime, false);
-    }
-
-
+    OtherActor->SetActorLocation(PortalBoxA->GetComponentLocation());
+    PutInCooldown(OtherActor);
 }
+
