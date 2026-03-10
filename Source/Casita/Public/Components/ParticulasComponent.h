@@ -26,6 +26,15 @@ public:
 	UPROPERTY(EditAnywhere, Category="Effects")
 	UNiagaraSystem* ParticleSystem;
 
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	float Cooldown = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	int32 MaxUses = 5;
+
 	void SpawnParticles();
+private:
+	float LastSpawnTime = -100.f;
+	int32 UsesRemaining;
 		
 };
