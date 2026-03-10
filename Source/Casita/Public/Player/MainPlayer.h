@@ -5,63 +5,41 @@
 #include "MainPlayer.generated.h"
 
 class UParticulasComponent;
+class UBoxComponent;
+class UStaticMeshComponent;
 
 UCLASS()
 class CASITA_API AMainPlayer : public APawn
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AMainPlayer();
+    AMainPlayer();
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// Función para llamar desde fuera (flores)
-	void AnclarEnFlor(FVector FlorPos);
+    virtual void Tick(float DeltaTime) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UParticulasComponent* ParticulasComponent;
+    UPROPERTY(VisibleAnywhere, Category = "Collision")
+    UBoxComponent* CollisionBox;
 
-	// Configuración de Crecimiento Orgánico
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float GrowSpeed = 400.0f;
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UStaticMeshComponent* MeshComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float SmoothFactor = 5.0f;
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UParticulasComponent* ParticulasComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float Vibracion = 5.0f;
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    float MoveSpeed = 600.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float CaidaFactor = 1.5f;
+    float InputForward = 0.0f;
+    float InputRight = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float LateralFactor = 1.0f;
-
-	// Estado interno
-	FVector GrowDirection;
-	FVector LastAnchorPosition;
-	bool bTieneUltimaAncla = false;
-
-	float InputForward = 0.0f;
-	float InputRight = 0.0f;
-
-	float distFromLastPoint = 0.0f;
-	float stepSize = 10.0f; // Equivalente al stepSize de Unity (ajustado a escala UE)
-	float tipRadius = 10.0f;
-
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void ActivateParticles();
-
-	UPROPERTY(EditAnywhere, Category = "Organic")
-	float StickDistance = 150.0f; // Radio de búsqueda de paredes
-
-	FVector CurrentSurfaceNormal = FVector::UpVector;
+    void MoveForward(float Value);
+    void MoveRight(float Value);
+    void ActivateParticles();
 };
