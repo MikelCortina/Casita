@@ -4,16 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "P_Player.generated.h"
+#include "MainPlayer.generated.h"
+
+class UParticulasComponent;
 
 UCLASS()
-class CASITA_API AP_Player : public APawn
+class CASITA_API AMainPlayer : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	AP_Player();
+	AMainPlayer();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,4 +28,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	// Aquí puedes agregar componentes, variables y funciones privadas para tu jugador
+	UPROPERTY(VisibleAnywhere)
+	UParticulasComponent* ParticulasComponent;
+
+	void ActivateParticles();
 };
