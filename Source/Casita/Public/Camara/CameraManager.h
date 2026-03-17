@@ -1,9 +1,8 @@
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Camera/CameraActor.h"
 #include "Components/SplineComponent.h"
+#include "Camera/CameraComponent.h"
 #include "CameraManager.generated.h"
 
 UCLASS()
@@ -19,40 +18,31 @@ protected:
     virtual void Tick(float DeltaTime) override;
 
 public:
-    UPROPERTY(EditAnywhere, Category = "Camera")
-    ACameraActor* CameraInicial;
-
-    UPROPERTY(EditAnywhere, Category = "Camera")
-    FVector CameraLocation;
-
-    UPROPERTY(EditAnywhere, Category = "Camera")
-    FRotator CameraRotation;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Spline")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     USplineComponent* CameraSpline;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+    UCameraComponent* CameraComp;
 
-    // Duración total del recorrido en segundos
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Spline")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
     float TravelDuration = 5.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Spline")
-    float TargetAlpha = 1.0f;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Spline")
-    float CurrentAlpha = 0.0f;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera|Spline")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     bool bIsMoving = false;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+    int32 CurrentPointIndex = 0;
 
     UFUNCTION(BlueprintCallable, Category = "Camera")
-    void StartSplineMovement();
+    void MoveToNextPoint();
 
     UFUNCTION(BlueprintCallable, Category = "Camera")
     void ActivateCamera();
 
 private:
     void UpdateCameraOnSpline(float Alpha);
+
+    float SegmentAlphaStart = 0.0f;
+    float SegmentAlphaEnd = 0.0f;
     float ElapsedTime = 0.0f;
 };

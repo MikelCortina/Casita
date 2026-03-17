@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Camera/CameraActor.h"
+#include "Camara/CameraManager.h"
 #include "NextLevel.generated.h"
 
 class UBoxComponent;
@@ -12,34 +13,47 @@ class UBoxComponent;
 UCLASS()
 class CASITA_API ANextLevel : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	ANextLevel();
+    ANextLevel();
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 public:
-	// Trigger que detecta al jugador
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* TriggerBox;
+    UPROPERTY(VisibleAnywhere)
+    UBoxComponent* TriggerBox;
 
-	// Cámara a la que rotará cuando el jugador llegue
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	ACameraActor* TargetCamera;
+    UPROPERTY(EditAnywhere, Category = "Camera|Estatica")
+    ACameraActor* TargetCamera;
 
-	// Duración del blend de la cámara
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	float BlendTime = 1.0f;
+    UPROPERTY(EditAnywhere, Category = "Camera|Estatica")
+    float BlendTime = 1.0f;
 
-	// Posición donde queremos teletransportar al jugador (opcional)
-	UPROPERTY(EditAnywhere, Category = "Player")
-	FVector PlayerNewLocation;
+    UPROPERTY(EditAnywhere, Category = "Camera|Spline")
+    ACameraManager* CameraManagerRef;
 
-	// Función que se llama al entrar en el trigger
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-		bool bFromSweep, const FHitResult& SweepResult);
+    UPROPERTY(EditAnywhere, Category = "Camera|Spline")
+    bool bUseSplineCamera = true;
+
+    UPROPERTY(EditAnywhere, Category = "Player")
+    FVector PlayerNewLocation;
+
+    UPROPERTY(EditAnywhere, Category = "Player")
+    bool bTeleportPlayer = true;
+
+    UPROPERTY(EditAnywhere, Category = "Trigger")
+    bool bTriggerOnce = true;
+
+protected:
+    bool bAlreadyTriggered = false;
+
+    UFUNCTION()
+    void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent,
+        class AActor* OtherActor,
+        class UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex,
+        bool bFromSweep,
+        const FHitResult& SweepResult);
 };
