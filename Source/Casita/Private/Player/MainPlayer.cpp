@@ -28,13 +28,22 @@ AMainPlayer::AMainPlayer()
 void AMainPlayer::BeginPlay()
 {
     Super::BeginPlay();
+
+    // Establecemos el punto de inicio como el primer checkpoint automáticamente
+    LastCheckpointLocation = GetActorLocation();
+    MaxDistanceReached = 0.0f;
+    bHasCheckpoint = true;
 }
 
 void AMainPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (InputForward != 0.0f || InputRight != 0.0f)
+    FVector DeltaMovement = FVector::ZeroVector;
+    bool bIsTryingToMove = (InputForward != 0.0f || InputRight != 0.0f);
+
+    // --- 1. MOVIMIENTO DE INPUT ---
+    if (bIsTryingToMove)
     {
         APlayerController* PC = Cast<APlayerController>(GetController());
         if (PC && PC->PlayerCameraManager)
@@ -48,22 +57,41 @@ void AMainPlayer::Tick(float DeltaTime)
             if (!MovementDirection.IsNearlyZero())
             {
                 MovementDirection.Normalize();
+                DeltaMovement = MovementDirection * MoveSpeed * DeltaTime;
+            }
+        }
+    }
 
-                // Calculamos el desplazamiento de este frame
-                FVector DeltaMovement = MovementDirection * MoveSpeed * DeltaTime;
+    // --- 2. GRAVEDAD ACUMULATIVA (Solo si hay Input) ---
+    if (bHasCheckpoint && bIsTryingToMove) // <--- Añadida condición de movimiento
+    {
+        // Calculamos distancia actual al último checkpoint
+        float CurrentDistance = FVector::Dist(GetActorLocation(), LastCheckpointLocation);
 
-                // Usamos AddActorWorldOffset con bSweep = true
-                // Esto permite que el motor maneje la colisión de forma nativa
-                FHitResult Hit;
-                AddActorWorldOffset(DeltaMovement, true, &Hit);
+        if (CurrentDistance > MaxDistanceReached)
+        {
+            MaxDistanceReached = CurrentDistance;
+        }
 
-                // Si chocamos, intentamos movernos solo en la dirección de la normal 
-                // para permitir un deslizamiento básico manual
-                if (Hit.IsValidBlockingHit())
-                {
-                    FVector SlideVector = FVector::VectorPlaneProject(DeltaMovement, Hit.Normal);
-                    AddActorWorldOffset(SlideVector, true);
-                }
+        // La fuerza de caída solo se calcula y aplica si el jugador se está moviendo
+        float VerticalFall = MaxDistanceReached * GravityFactor * DeltaTime;
+        DeltaMovement.Z -= VerticalFall;
+    }
+
+    // --- 3. APLICAR MOVIMIENTO FINAL ---
+    if (!DeltaMovement.IsNearlyZero())
+    {
+        FHitResult Hit;
+        // El barrido (sweep) es true para que choque con el suelo/paredes
+        AddActorWorldOffset(DeltaMovement, true, &Hit);
+
+        // Deslizamiento simple
+        if (Hit.IsValidBlockingHit())
+        {
+            FVector SlideVector = FVector::VectorPlaneProject(DeltaMovement, Hit.Normal);
+            if (SlideVector.Size() > 0.01f)
+            {
+                AddActorWorldOffset(SlideVector, true);
             }
         }
     }
@@ -74,7 +102,22 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     Super::SetupPlayerInputComponent(PlayerInputComponent);
     PlayerInputComponent->BindAxis("MoveForward", this, &AMainPlayer::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMainPlayer::MoveRight);
-    PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::ActivateParticles);
+
+    // Cambiamos o añadimos el espacio para el Checkpoint
+    PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::SetCheckpoint);
+}
+
+void AMainPlayer::SetCheckpoint()
+{
+    // Aquí podrías llamar a tu ParticulasComponent también
+    if (ParticulasComponent) ParticulasComponent->SpawnParticles();
+
+    // Lógica de Unity: El punto actual se vuelve el nuevo origen
+    LastCheckpointLocation = GetActorLocation();
+    MaxDistanceReached = 0.0f; // Reseteamos la "tensión" al poner la flor
+    bHasCheckpoint = true;
+
+    UE_LOG(LogTemp, Warning, TEXT("Checkpoint fijado en: %s"), *LastCheckpointLocation.ToString());
 }
 
 void AMainPlayer::MoveForward(float Value) { InputForward = Value; }

@@ -42,4 +42,19 @@ private:
     void MoveForward(float Value);
     void MoveRight(float Value);
     void ActivateParticles();
+
+    // --- NUEVAS VARIABLES PARA EL SISTEMA DE GRAVEDAD ---
+    UPROPERTY(EditAnywhere, Category = "Movement|Gravity")
+    float GravityFactor = 2.0f; // Multiplicador de caída
+
+    FVector LastCheckpointLocation;
+    bool bHasCheckpoint = true;
+    float MaxDistanceReached = 0.0f; // Para que no se reduzca al volver
+
+    FVector CurrentGravityVelocity; // Acumulador de caída
+
+    void SetCheckpoint();
+    void ApplyDistanceGravity(float DeltaTime);
+
+
 };
