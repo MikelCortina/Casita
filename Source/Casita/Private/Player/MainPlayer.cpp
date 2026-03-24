@@ -3,6 +3,8 @@
 #include "Components/InputComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+// --- NUEVO: Incluir la librería del componente instanciado ---
+#include "Components/InstancedStaticMeshComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 
@@ -22,6 +24,15 @@ AMainPlayer::AMainPlayer()
     MeshComponent->SetupAttachment(RootComponent);
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+    // --- NUEVO: Configuración del InstancedTrailComponent ---
+    InstancedTrailComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("InstancedTrail"));
+    InstancedTrailComponent->SetupAttachment(RootComponent);
+    InstancedTrailComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    // Para que las instancias no se muevan cuando el jugador avanza, 
+    // desligamos el componente de la posición y rotación del Root:
+    InstancedTrailComponent->SetAbsolute(true, true, true);
+    // --------------------------------------------------------
+
     ParticulasComponent = CreateDefaultSubobject<UParticulasComponent>(TEXT("ParticulasComponent"));
 }
 
@@ -33,6 +44,9 @@ void AMainPlayer::BeginPlay()
     LastCheckpointLocation = GetActorLocation();
     MaxDistanceReached = 0.0f;
     bHasCheckpoint = true;
+
+    // --- NUEVO: Inicializamos la posición de la estela ---
+    LastTrailLocation = GetActorLocation();
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -63,7 +77,7 @@ void AMainPlayer::Tick(float DeltaTime)
     }
 
     // --- 2. GRAVEDAD ACUMULATIVA (Solo si hay Input) ---
-    if (bHasCheckpoint && bIsTryingToMove) // <--- Añadida condición de movimiento
+    if (bHasCheckpoint && bIsTryingToMove)
     {
         // Calculamos distancia actual al último checkpoint
         float CurrentDistance = FVector::Dist(GetActorLocation(), LastCheckpointLocation);
@@ -94,6 +108,35 @@ void AMainPlayer::Tick(float DeltaTime)
                 AddActorWorldOffset(SlideVector, true);
             }
         }
+    }
+
+    // --- 4. NUEVO: GENERAR LA RAMA A SU PASO ---
+    float DistanceSinceLastTrail = FVector::Dist(GetActorLocation(), LastTrailLocation);
+
+    if (DistanceSinceLastTrail >= SpawnTrailDistance)
+    {
+        FTransform SpawnTransform;
+        SpawnTransform.SetLocation(GetActorLocation());
+
+        // --- NUEVO: Le aplicamos la escala que hayas configurado ---
+        SpawnTransform.SetScale3D(TrailScale);
+
+        // Hacer que la rama apunte hacia la dirección del movimiento
+        if (!DeltaMovement.IsNearlyZero())
+        {
+            SpawnTransform.SetRotation(DeltaMovement.Rotation().Quaternion());
+        }
+        else
+        {
+            SpawnTransform.SetRotation(GetActorRotation().Quaternion());
+        }
+
+        if (InstancedTrailComponent)
+        {
+            InstancedTrailComponent->AddInstanceWorldSpace(SpawnTransform);
+        }
+
+        LastTrailLocation = GetActorLocation();
     }
 }
 
