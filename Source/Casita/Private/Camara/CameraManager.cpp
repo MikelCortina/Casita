@@ -32,6 +32,7 @@ void ACameraManager::BeginPlay()
 
     UE_LOG(LogTemp, Warning, TEXT("CameraManager: %d puntos en el spline"),
         CameraSpline->GetNumberOfSplinePoints());
+    ActivateCamera();
 }
 
 void ACameraManager::Tick(float DeltaTime)
