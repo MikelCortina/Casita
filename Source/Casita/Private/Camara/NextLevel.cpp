@@ -6,40 +6,75 @@
 #include "Player/MainPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 ANextLevel::ANextLevel()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = false;
 
-	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
-	RootComponent = TriggerBox;
-	TriggerBox->SetCollisionProfileName("Trigger");
-
-	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ANextLevel::OnOverlapBegin);
+    TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+    RootComponent = TriggerBox;
+    TriggerBox->SetBoxExtent(FVector(50.f, 50.f, 50.f));
+    TriggerBox->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+    TriggerBox->SetGenerateOverlapEvents(true);
+    TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void ANextLevel::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
+    
+    if (TriggerBox)
+    {
+        TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ANextLevel::OnOverlapBegin);
+    }
+    CameraManagerRef = Cast<ACameraManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraManager::StaticClass()));
 }
 
-void ANextLevel::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
+void ANextLevel::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex,
+    bool bFromSweep,
+    const FHitResult& SweepResult)
 {
-	AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
-	if (!Player) return;
+    if (!OverlappedComponent || !OtherActor)
+        return;
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PC && TargetCamera)
-	{
-		// Rotar la cámara hacia el lateral de la casa
-		PC->SetViewTargetWithBlend(TargetCamera, BlendTime);
+    if(OtherActor->IsA(AMainPlayer::StaticClass()) || OtherActor->IsA(ACharacter::StaticClass()))
+    {
+        
+    }
+    else
+    {
+        return;
 	}
+    // Control de disparo ï¿½nico
+    if (bTriggerOnce && bAlreadyTriggered) return;
+    bAlreadyTriggered = true;
 
-	// Teletransportar al jugador a la nueva posición
-	if (!PlayerNewLocation.IsZero())
-	{
-		Player->SetActorLocation(PlayerNewLocation);
-	}
+    APlayerController* PC =
+        UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    if (!PC) return;
+
+    if (bUseSplineCamera && CameraManagerRef)
+    {
+        CameraManagerRef->MoveToNextPoint();
+        // El CameraManager se encarga del blend internamente
+    }
+    else if (!bUseSplineCamera && TargetCamera)
+    {
+        PC->SetViewTargetWithBlend(TargetCamera, BlendTime);
+    }
+
+    if (bTeleportPlayer && !PlayerNewLocation.IsZero())
+    {
+        OtherActor->SetActorLocation(PlayerNewLocation, false, nullptr,
+            ETeleportType::TeleportPhysics);
+    }
+    if (bTriggerOnce)
+    {
+        Destroy();
+        SetActorEnableCollision(false);
+    }
 }
