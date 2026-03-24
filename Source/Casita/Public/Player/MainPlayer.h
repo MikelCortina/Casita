@@ -4,9 +4,11 @@
 #include "GameFramework/Pawn.h"
 #include "MainPlayer.generated.h"
 
-class UParticulasComponent;
 class UBoxComponent;
 class UStaticMeshComponent;
+class UParticulasComponent;
+// --- NUEVO: Declaración del componente instanciado ---
+class UInstancedStaticMeshComponent;
 
 UCLASS()
 class CASITA_API AMainPlayer : public APawn
@@ -23,23 +25,47 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:
-    UPROPERTY(VisibleAnywhere, Category = "Collision")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UBoxComponent* CollisionBox;
 
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UStaticMeshComponent* MeshComponent;
 
-    UPROPERTY(VisibleAnywhere, Category = "Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UParticulasComponent* ParticulasComponent;
 
-    UPROPERTY(EditAnywhere, Category = "Movement")
+    // --- NUEVO: Componente para las copias de la rama ---
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Branch Trail")
+    UInstancedStaticMeshComponent* InstancedTrailComponent;
+
+    // --- NUEVO: Distancia requerida para soltar una nueva copia ---
+  // --- NUEVO: Distancia requerida para soltar una nueva copia ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Branch Trail")
+    float SpawnTrailDistance = 50.0f;
+
+    // --- NUEVO: Escala de las copias del trail ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Branch Trail")
+    FVector TrailScale = FVector(0.5f, 0.5f, 0.5f); // 0.5 significa la mitad de su tamaño
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float MoveSpeed = 600.0f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float GravityFactor = 0.5f;
+
+private:
     float InputForward = 0.0f;
     float InputRight = 0.0f;
+
+    FVector LastCheckpointLocation;
+    float MaxDistanceReached;
+    bool bHasCheckpoint = false;
+
+    // --- NUEVO: Para saber dónde soltamos la última rama ---
+    FVector LastTrailLocation;
 
     void MoveForward(float Value);
     void MoveRight(float Value);
     void ActivateParticles();
+    void SetCheckpoint();
 };
