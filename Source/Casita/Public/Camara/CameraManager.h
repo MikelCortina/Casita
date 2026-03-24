@@ -18,31 +18,33 @@ protected:
     virtual void Tick(float DeltaTime) override;
 
 public:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-    USplineComponent* CameraSpline;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-    UCameraComponent* CameraComp;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-    float TravelDuration = 5.0f;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-    bool bIsMoving = false;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-    int32 CurrentPointIndex = 0;
-
-    UFUNCTION(BlueprintCallable, Category = "Camera")
     void MoveToNextPoint();
-
-    UFUNCTION(BlueprintCallable, Category = "Camera")
     void ActivateCamera();
+
+    void DisableInput();
+    void EnableInput();
+
+    bool IsCameraMoving() const { return bIsMoving; }
 
 private:
     void UpdateCameraOnSpline(float Alpha);
 
-    float SegmentAlphaStart = 0.0f;
-    float SegmentAlphaEnd = 0.0f;
+public:
+    UPROPERTY(EditAnywhere)
+    USplineComponent* CameraSpline;
+
+    UPROPERTY(EditAnywhere)
+    UCameraComponent* CameraComp;
+
+    UPROPERTY(EditAnywhere)
+    float TravelDuration = 2.0f;
+
+private:
+    int32 CurrentPointIndex = 0;
+
+    float SegmentAlphaStart;
+    float SegmentAlphaEnd;
     float ElapsedTime = 0.0f;
+
+    bool bIsMoving = false;
 };

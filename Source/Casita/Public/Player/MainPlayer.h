@@ -53,6 +53,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float GravityFactor = 0.5f;
 
+    void SetCameraIsMoving(bool bNewValue) {
+        bCameraMoving = bNewValue;
+        SetActorHiddenInGame(bNewValue);
+    }
+
 private:
     float InputForward = 0.0f;
     float InputRight = 0.0f;
@@ -60,7 +65,7 @@ private:
     FVector LastCheckpointLocation;
     float MaxDistanceReached;
     bool bHasCheckpoint = false;
-
+    bool bCameraMoving = false;
     // --- NUEVO: Para saber dónde soltamos la última rama ---
     FVector LastTrailLocation;
 

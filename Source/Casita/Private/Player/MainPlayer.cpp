@@ -52,7 +52,7 @@ void AMainPlayer::BeginPlay()
 void AMainPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    if (bCameraMoving) return;
     FVector DeltaMovement = FVector::ZeroVector;
     bool bIsTryingToMove = (InputForward != 0.0f || InputRight != 0.0f);
 
