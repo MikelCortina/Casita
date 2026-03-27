@@ -3,6 +3,7 @@
 #include "GameFramework/Actor.h"
 #include "Camera/CameraActor.h"
 #include "Camara/CameraManager.h"
+#include "Components/PortalComponent.h"
 #include "NextLevel.generated.h"
 
 class UBoxComponent;
@@ -11,6 +12,7 @@ UCLASS()
 class CASITA_API ANextLevel : public AActor
 {
     GENERATED_BODY()
+
 public:
     ANextLevel();
 
@@ -43,10 +45,13 @@ public:
     UPROPERTY(EditAnywhere, Category = "Trigger")
     bool bTriggerOnce = true;
 
+    // --- Partículas del portal ---
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
+    UPortalComponent* PortalComponent;
+
 protected:
     bool bAlreadyTriggered = false;
 
-    // Desactiva colisión y overlap sin destruir todavía
     void DisableTrigger();
 
     UFUNCTION()
@@ -57,4 +62,8 @@ protected:
         int32 OtherBodyIndex,
         bool bFromSweep,
         const FHitResult& SweepResult);
+
+private:
+    void CheckCameraMovement();
+    FTimerHandle CameraCheckTimer;
 };
