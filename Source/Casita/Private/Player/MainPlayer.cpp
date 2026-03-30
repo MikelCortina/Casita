@@ -153,6 +153,11 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AMainPlayer::SetCheckpoint()
 {
+    if (bCameraMoving)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No puedes usar partículas mientras la cámara se mueve."));
+        return;
+    }
     // 1. Si no quedan usos, no hacemos nada
     if (RemainingCheckpoints <= 0)
     {
@@ -185,12 +190,10 @@ void AMainPlayer::ResetPlayerState()
     // Para que la estela de ramas no empiece estirada desde el portal anterior
     LastTrailLocation = GetActorLocation();
 
-    // OPCIONAL: Si quieres borrar las ramas del nivel anterior al cruzar el portal
-    if (InstancedTrailComponent)
+    if (ParticulasComponent)
     {
-        InstancedTrailComponent->ClearInstances();
+        ParticulasComponent->ResetUses();
     }
-
     UE_LOG(LogTemp, Warning, TEXT("¡Estado del jugador reseteado en el nuevo portal!"));
 }
 

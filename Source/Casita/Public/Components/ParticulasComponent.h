@@ -32,6 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	int32 MaxUses = 5;
 
+	void ResetUses();
 	void SpawnParticles();
 private:
 	float LastSpawnTime = -100.f;
