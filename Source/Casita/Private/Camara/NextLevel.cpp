@@ -58,19 +58,23 @@ void ANextLevel::OnOverlapBegin(
 
     if (bTriggerOnce && bAlreadyTriggered) return;
 
-    // --- 1. Teletransportar al jugador ---
     if (LinkedPortal)
     {
         LinkedPortal->DisableTrigger();
+
         FVector Destination = LinkedPortal->GetActorLocation();
         OtherActor->SetActorLocation(Destination, false, nullptr, ETeleportType::TeleportPhysics);
 
+        // --- NUEVO: Avisar al jugador que se ha teletransportado ---
+        AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
+        if (Player)
+        {
+            Player->ResetPlayerState();
+        }
+
         if (!bTriggerOnce)
         {
-            FTimerHandle TimerHandle;
-            GetWorldTimerManager().SetTimer(TimerHandle, [this]() {
-                if (LinkedPortal) LinkedPortal->bAlreadyTriggered = false;
-                }, 0.5f, false);
+
         }
     }
 

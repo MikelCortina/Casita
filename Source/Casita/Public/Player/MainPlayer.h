@@ -57,6 +57,16 @@ public:
         bCameraMoving = bNewValue;
         SetActorHiddenInGame(bNewValue);
     }
+    // --- NUEVO: Limitar los checkpoints ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+    int32 MaxCheckpointUses = 5;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
+    int32 RemainingCheckpoints = 5;
+
+    // Función para resetear todo al cruzar el portal
+    void ResetPlayerState();
+    void SetCheckpoint();
 
 private:
     float InputForward = 0.0f;
@@ -72,5 +82,5 @@ private:
     void MoveForward(float Value);
     void MoveRight(float Value);
     void ActivateParticles();
-    void SetCheckpoint();
+
 };

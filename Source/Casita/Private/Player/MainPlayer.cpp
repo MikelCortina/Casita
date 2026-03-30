@@ -40,14 +40,15 @@ void AMainPlayer::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Establecemos el punto de inicio como el primer checkpoint automáticamente
     LastCheckpointLocation = GetActorLocation();
     MaxDistanceReached = 0.0f;
     bHasCheckpoint = true;
-
-    // --- NUEVO: Inicializamos la posición de la estela ---
     LastTrailLocation = GetActorLocation();
+
+    // --- NUEVO: Inicializar las cargas del portal ---
+    RemainingCheckpoints = MaxCheckpointUses;
 }
+
 
 void AMainPlayer::Tick(float DeltaTime)
 {
@@ -152,16 +153,47 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AMainPlayer::SetCheckpoint()
 {
-    // Aquí podrías llamar a tu ParticulasComponent también
+    // 1. Si no quedan usos, no hacemos nada
+    if (RemainingCheckpoints <= 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("¡No te quedan más flores/checkpoints!"));
+        return;
+    }
+
     if (ParticulasComponent) ParticulasComponent->SpawnParticles();
 
-    // Lógica de Unity: El punto actual se vuelve el nuevo origen
     LastCheckpointLocation = GetActorLocation();
-    MaxDistanceReached = 0.0f; // Reseteamos la "tensión" al poner la flor
+    MaxDistanceReached = 0.0f; // Reseteamos la tensión
     bHasCheckpoint = true;
 
-    UE_LOG(LogTemp, Warning, TEXT("Checkpoint fijado en: %s"), *LastCheckpointLocation.ToString());
+    // 2. Restamos una carga
+    RemainingCheckpoints--;
+
+    UE_LOG(LogTemp, Warning, TEXT("Checkpoint fijado. Quedan: %d usos."), RemainingCheckpoints);
 }
+
+// --- NUEVO: Función para limpiar todo al cambiar de portal ---
+void AMainPlayer::ResetPlayerState()
+{
+    // Reseteamos las cargas a tope
+    RemainingCheckpoints = MaxCheckpointUses;
+
+    // Establecemos la nueva posición (ya teletransportada) como punto cero
+    LastCheckpointLocation = GetActorLocation();
+    MaxDistanceReached = 0.0f;
+
+    // Para que la estela de ramas no empiece estirada desde el portal anterior
+    LastTrailLocation = GetActorLocation();
+
+    // OPCIONAL: Si quieres borrar las ramas del nivel anterior al cruzar el portal
+    if (InstancedTrailComponent)
+    {
+        InstancedTrailComponent->ClearInstances();
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("¡Estado del jugador reseteado en el nuevo portal!"));
+}
+
 
 void AMainPlayer::MoveForward(float Value) { InputForward = Value; }
 void AMainPlayer::MoveRight(float Value) { InputRight = Value; }
