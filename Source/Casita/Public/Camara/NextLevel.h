@@ -4,6 +4,7 @@
 #include "Camera/CameraActor.h"
 #include "Camara/CameraManager.h"
 #include "Components/PortalComponent.h"
+#include "Components/AbsorptionComponent.h"
 #include "NextLevel.generated.h"
 
 class UBoxComponent;
@@ -45,14 +46,19 @@ public:
     UPROPERTY(EditAnywhere, Category = "Trigger")
     bool bTriggerOnce = true;
 
-    // --- Partículas del portal ---
+    // --- Partículas portal permanente ---
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
     UPortalComponent* PortalComponent;
+
+    // --- Partículas absorción ---
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
+    UAbsorptionComponent* AbsorptionComponent;
 
 protected:
     bool bAlreadyTriggered = false;
 
     void DisableTrigger();
+    void CleanupAndDestroy();
 
     UFUNCTION()
     void OnOverlapBegin(

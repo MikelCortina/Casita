@@ -16,10 +16,9 @@ ANextLevel::ANextLevel()
     TriggerBox->SetGenerateOverlapEvents(true);
     TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
+    // Partículas portal permanente
     PortalComponent = CreateDefaultSubobject<UPortalComponent>(TEXT("PortalComponent"));
 
-    // Si no haces esto, el componente flota en el vacío (0,0,0)
-    PortalComponent->SetupAttachment(RootComponent);
 }
 
 void ANextLevel::BeginPlay()
@@ -43,90 +42,110 @@ void ANextLevel::DisableTrigger()
     bAlreadyTriggered = true;
 }
 
-void ANextLevel::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ANextLevel::OnOverlapBegin(
+    UPrimitiveComponent* OverlappedComponent,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex,
+    bool bFromSweep,
+    const FHitResult& SweepResult)
 {
     if (!OverlappedComponent || !OtherActor) return;
 
+    // Filtro de clase
     if (!OtherActor->IsA(AMainPlayer::StaticClass()) && !OtherActor->IsA(ACharacter::StaticClass()))
         return;
 
     if (bTriggerOnce && bAlreadyTriggered) return;
 
-    // IMPORTANTE: Marcamos que ya se activó y desactivamos el trigger 
-    // para que no haya teletransportes infinitos mientras la cámara viaja.
-    bAlreadyTriggered = true;
-    DisableTrigger();
-
-    // --- Teleport ---
+    // --- 1. Teletransportar al jugador ---
     if (LinkedPortal)
     {
         LinkedPortal->DisableTrigger();
         FVector Destination = LinkedPortal->GetActorLocation();
         OtherActor->SetActorLocation(Destination, false, nullptr, ETeleportType::TeleportPhysics);
+
+        if (!bTriggerOnce)
+        {
+            FTimerHandle TimerHandle;
+            GetWorldTimerManager().SetTimer(TimerHandle, [this]() {
+                if (LinkedPortal) LinkedPortal->bAlreadyTriggered = false;
+                }, 0.5f, false);
+        }
     }
 
-    // --- Cámara ---
+    // --- 2. Lógica de Cámara y FX ---
     APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     if (PC)
     {
         if (bUseSplineCamera && CameraManagerRef)
         {
-            if (CameraManagerRef->IsCameraMoving())
-            {
-                CameraManagerRef->DisableInput();
-            }
-            else
-            {
-                CameraManagerRef->MoveToNextPoint();
-            }
+            // Iniciamos el movimiento de cámara
+            CameraManagerRef->MoveToNextPoint();
 
+            // ACTIVAR ABSORCIÓN: Justo ahora que la cámara empieza a moverse
             if (PortalComponent)
+            {
                 PortalComponent->ActivateAbsorption();
+            }
 
-            // Iniciamos el timer que revisa cuándo se para la cámara
-            GetWorldTimerManager().SetTimer(CameraCheckTimer, this, &ANextLevel::CheckCameraMovement, 0.2f, true);
+            if (LinkedPortal && LinkedPortal->PortalComponent)
+            {
+                LinkedPortal->PortalComponent->ActivateAbsorption();
+            }
+
+            // Iniciar el "Poll" (vigilancia) para detectar cuando la cámara para
+            GetWorldTimerManager().SetTimer(
+                CameraCheckTimer,
+                this,
+                &ANextLevel::CheckCameraMovement,
+                0.1f, // Revisamos cada 0.1s para mayor precisión
+                true
+            );
         }
         else if (!bUseSplineCamera && TargetCamera)
         {
             PC->SetViewTargetWithBlend(TargetCamera, BlendTime);
-
+            // Si es cámara estática, sí podemos limpiar aquí
+            if (bTriggerOnce) { CleanupAndDestroy(); }
         }
     }
 
+    // IMPORTANTE: bAlreadyTriggered evita que el overlap se ejecute mil veces
+    bAlreadyTriggered = true;
 }
 
 void ANextLevel::CheckCameraMovement()
 {
     if (!CameraManagerRef) return;
 
-    // Si la cámara ya terminó de moverse...
+    // Si la cámara ya NO se está moviendo...
     if (!CameraManagerRef->IsCameraMoving())
     {
-        // 1. Apagar efectos visuales
         if (PortalComponent)
+        {
+            // APAGAR ABSORCIÓN: La cámara se detuvo
             PortalComponent->DeactivateAbsorption();
 
-        // 2. Limpiar el timer para que deje de ejecutar esta función
+            // APAGAR PORTAL: Opcional, si quieres que el portal desaparezca al llegar
+            PortalComponent->DeactivatePortal();
+        }
+
+        // Detener el reloj de vigilancia
         GetWorldTimerManager().ClearTimer(CameraCheckTimer);
 
-        // 3. Lógica de destrucción diferida
+        // Si era de un solo uso, ahora es el momento seguro para destruir el actor
         if (bTriggerOnce)
         {
-            // Limpiar partículas antes de borrar
-            if (PortalComponent)
-                PortalComponent->DestroyFX();
-
-            if (LinkedPortal)
-            {
-                // También limpiamos las partículas del portal pareja si las tiene
-                if (LinkedPortal->PortalComponent)
-                    LinkedPortal->PortalComponent->DestroyFX();
-
-                LinkedPortal->Destroy();
-            }
-
-            // Finalmente, nos destruimos a nosotros mismos
-            Destroy();
+            CleanupAndDestroy();
         }
     }
+}
+
+// Función auxiliar para limpiar todo ordenadamente
+void ANextLevel::CleanupAndDestroy()
+{
+    if (PortalComponent) PortalComponent->DestroyFX();
+    if (LinkedPortal) LinkedPortal->Destroy();
+    Destroy();
 }

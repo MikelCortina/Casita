@@ -4,7 +4,7 @@
 
 UAbsorptionComponent::UAbsorptionComponent()
 {
-    PrimaryComponentTick.bCanEverTick = true; // Por si quieres hacer lógica de succión en el Tick
+    PrimaryComponentTick.bCanEverTick = false; // Por si quieres hacer lógica de succión en el Tick
 }
 
 void UAbsorptionComponent::BeginPlay()

@@ -1,73 +1,93 @@
 #include "Components/PortalComponent.h"
-#include "NiagaraComponent.h" 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 
 UPortalComponent::UPortalComponent()
 {
-    PrimaryComponentTick.bCanEverTick = false;
+    PrimaryComponentTick.bCanEverTick = true;
 
-    MainPortalComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("MainPortalFX"));
-    MainPortalComponent->SetupAttachment(this);
-
-    MainPortalComponent->SetRelativeRotation(FRotator(90.f, 90.f, 90.f));
-
-    AbsorptionComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("AbsorptionFX"));
-    AbsorptionComponent->SetupAttachment(this);
-
-    AbsorptionComponent->bAutoActivate = false;
+    // Solo declaramos los punteros, los inicializamos en BeginPlay
+    MainPortalComponent = nullptr;
+    AbsorptionFXComponent = nullptr;
 }
 
 void UPortalComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    MainPortalComponent = NewObject<UNiagaraComponent>(this, TEXT("MainPortalFX"));
-    if (MainPortalComponent)
+    // --- 1. Portal Principal (Queremos que aparezca SIEMPRE) ---
+    if (MainPortalAsset)
     {
-        MainPortalComponent->RegisterComponent();
-
-        MainPortalComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
-        // Rotación vertical DESPUÉS de atacharlo
-        MainPortalComponent->SetRelativeRotation(FRotator(90.f, 90.f, 90.f));
-
-        if (MainPortalAsset)
-        {
-            MainPortalComponent->SetAsset(MainPortalAsset);
-            MainPortalComponent->Activate();
-        }
+        MainPortalComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+            MainPortalAsset,
+            this,                                     // Componente al que se engancha
+            NAME_None,                                // Nombre del socket (ninguno)
+            FVector::ZeroVector,                      // Posición relativa
+            FRotator(90.f, 90.f, 90.f),               // Rotación relativa
+            EAttachLocation::SnapToTarget,            // Regla de adjuntado
+            false,                                    // bAutoDestroy (No queremos que se destruya solo)
+            true                                      // bAutoActivate (SÍ se activa al nacer)
+        );
     }
 
-    // Repetir la misma lógica de AttachToComponent para el AbsorptionComponent...
+    // --- 2. Absorción (Queremos que aparezca SOLO al moverse) ---
+    if (AbsorptionAsset)
+    {
+        AbsorptionFXComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+            AbsorptionAsset,
+            this,
+            NAME_None,
+            FVector::ZeroVector,
+            FRotator(90.f, 90.f, 90.f),
+            EAttachLocation::SnapToTarget,
+            false,                                    // bAutoDestroy
+            false                                     // bAutoActivate (¡FALSO! Empieza apagado de verdad)
+        );
+
+        // Por si las moscas, un seguro de vida extra
+        if (AbsorptionFXComponent)
+        {
+            AbsorptionFXComponent->DeactivateImmediate();
+        }
+    }
+}
+void UPortalComponent::ActivatePortal()
+{
+    if (MainPortalComponent)
+        MainPortalComponent->Activate(true);
+}
+
+void UPortalComponent::DeactivatePortal()
+{
+    if (MainPortalComponent)
+        MainPortalComponent->Deactivate();
 }
 
 void UPortalComponent::ActivateAbsorption()
 {
- 
-    if (AbsorptionComponent)
-    {
-        AbsorptionComponent->Activate();
-    }
+    if (AbsorptionFXComponent)
+        AbsorptionFXComponent->Activate(true);
 }
 
 void UPortalComponent::DeactivateAbsorption()
 {
-    // Función que ya llamas desde ANextLevel::CheckCameraMovement
-    if (AbsorptionComponent)
-    {
-        AbsorptionComponent->Deactivate();
-    }
+    if (AbsorptionFXComponent)
+        AbsorptionFXComponent->Deactivate();
 }
 
 void UPortalComponent::DestroyFX()
 {
-    // Destruimos las partículas de forma segura cuando el portal es de un solo uso
     if (MainPortalComponent)
     {
+        MainPortalComponent->DeactivateImmediate();
         MainPortalComponent->DestroyComponent();
+        MainPortalComponent = nullptr;
     }
-
-    if (AbsorptionComponent)
+    if (AbsorptionFXComponent)
     {
-        AbsorptionComponent->DestroyComponent();
+        AbsorptionFXComponent->DeactivateImmediate();
+        AbsorptionFXComponent->DestroyComponent();
+        AbsorptionFXComponent = nullptr;
     }
 }
