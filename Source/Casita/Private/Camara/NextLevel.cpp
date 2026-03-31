@@ -19,6 +19,7 @@ ANextLevel::ANextLevel()
     // Partículas portal permanente
     PortalComponent = CreateDefaultSubobject<UPortalComponent>(TEXT("PortalComponent"));
 
+    PortalComponent->SetupAttachment(RootComponent);
 }
 
 void ANextLevel::BeginPlay()
