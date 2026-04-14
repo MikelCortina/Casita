@@ -3,6 +3,7 @@
 #include "Components/FissureComponent.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystemInstanceController.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
 
@@ -53,7 +54,7 @@ void UFissureComponent::OnTriggerBeginOverlap(
         UE_LOG(LogTemp, Warning, TEXT("Overlap detectado con: %s"), *OtherActor->GetName());
     }
 
-    if (!OtherActor || !OtherActor->IsA<ACharacter>() || bOnCooldown)
+    if (!OtherActor || !OtherActor->IsA<APawn>() || bOnCooldown)
         return;
 
     SpawnParticleExplosion();
@@ -61,14 +62,10 @@ void UFissureComponent::OnTriggerBeginOverlap(
 
 void UFissureComponent::SpawnParticleExplosion()
 {
-    if (!ExplosionEffect)
-    {
-        UE_LOG(LogTemp, Warning,
-            TEXT("FissureComponent: ExplosionEffect no está asignado en '%s'. "
-                "Asígnalo en el editor."),
-            *GetOwner()->GetName());
-        return;
-    }
+    if (bHasBeenTriggered) return;
+    bHasBeenTriggered = true;
+
+    if (!ExplosionEffect) return;
 
     FVector  SpawnLocation = GetOwner()->GetActorLocation();
     FRotator SpawnRotation = GetOwner()->GetActorRotation();
@@ -79,23 +76,8 @@ void UFissureComponent::SpawnParticleExplosion()
         SpawnLocation,
         SpawnRotation,
         FVector(EffectScale),
-        true,  // auto-destroy al terminar
-        true,  // activar inmediatamente
+        false, 
+        true,
         ENCPoolMethod::None
     );
-
-    // Activa el cooldown para no spawnear spam
-    bOnCooldown = true;
-    GetWorld()->GetTimerManager().SetTimer(
-        CooldownTimerHandle,
-        this,
-        &UFissureComponent::ResetCooldown,
-        TriggerCooldown,
-        false
-    );
-}
-
-void UFissureComponent::ResetCooldown()
-{
-    bOnCooldown = false;
 }

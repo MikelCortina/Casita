@@ -55,6 +55,6 @@ private:
         int32 OtherBodyIndex,
         bool bFromSweep,
         const FHitResult& SweepResult);
+    bool bHasBeenTriggered = false;
 
-    void ResetCooldown();
 };
