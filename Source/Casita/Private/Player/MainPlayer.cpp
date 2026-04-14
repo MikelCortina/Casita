@@ -147,6 +147,7 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     PlayerInputComponent->BindAxis("MoveForward", this, &AMainPlayer::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMainPlayer::MoveRight);
 
+
     // Cambiamos o añadimos el espacio para el Checkpoint
     PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::SetCheckpoint);
 }
