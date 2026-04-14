@@ -24,6 +24,10 @@ void UParticulasComponent::BeginPlay()
 	
 }
 
+void UParticulasComponent::ResetUses()
+{
+	UsesRemaining = MaxUses;
+}
 
 // Called every frame
 void UParticulasComponent::SpawnParticles()
