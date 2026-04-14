@@ -10,7 +10,6 @@ class UParticulasComponent;
 // --- NUEVO: Declaración del componente instanciado ---
 class UInstancedStaticMeshComponent;
 
-
 UCLASS()
 class CASITA_API AMainPlayer : public APawn
 {
