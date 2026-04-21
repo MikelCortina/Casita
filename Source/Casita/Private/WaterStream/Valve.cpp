@@ -1,10 +1,13 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #include "WaterStream/Valve.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Player/MainPlayer.h"
-#include "WaterStream/WaterStream.h"
+#include "WaterStream/HardWaterStream.h"
 #include "GameFramework/PlayerController.h"
 
+// Sets default values
 AValve::AValve()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -39,12 +42,12 @@ void AValve::BeginPlay()
     }
 }
 
-void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
-    AActor* OtherActor,
-    UPrimitiveComponent* OtherComp,
+void AValve::OnProximityBeginOverlap(UPrimitiveComponent * OverlappedComp,
+    AActor * OtherActor,
+    UPrimitiveComponent * OtherComp,
     int32 OtherBodyIndex,
     bool bFromSweep,
-    const FHitResult& SweepResult)
+    const FHitResult & SweepResult)
 {
     if (Cast<AMainPlayer>(OtherActor))
     {
@@ -53,9 +56,9 @@ void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
     }
 }
 
-void AValve::OnProximityEndOverlap(UPrimitiveComponent* OverlappedComp,
-    AActor* OtherActor,
-    UPrimitiveComponent* OtherComp,
+void AValve::OnProximityEndOverlap(UPrimitiveComponent * OverlappedComp,
+    AActor * OtherActor,
+    UPrimitiveComponent * OtherComp,
     int32 OtherBodyIndex)
 {
     if (Cast<AMainPlayer>(OtherActor))

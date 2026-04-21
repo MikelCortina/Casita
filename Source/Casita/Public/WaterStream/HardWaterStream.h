@@ -1,18 +1,20 @@
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"
-#include "WaterStream.generated.h"
+#include "HardWaterStream.generated.h"
 
 UCLASS()
-class CASITA_API AWaterStream : public AActor
+class CASITA_API AHardWaterStream : public AActor
 {
-    GENERATED_BODY()
-
-public:
-    AWaterStream();
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AHardWaterStream();
 
     // Llamado por AValve cuando se cierra el agua
     void DeactivateStream();
@@ -23,7 +25,5 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     class UNiagaraComponent* WaterEffect;
+
 };
-
-
-

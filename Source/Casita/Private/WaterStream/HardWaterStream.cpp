@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WaterStream/WaterStream.h"
+#include "WaterStream/HardWaterStream.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 
 // Sets default values
-AWaterStream::AWaterStream()
+AHardWaterStream::AHardWaterStream()
 {
     PrimaryActorTick.bCanEverTick = false;
 
@@ -19,7 +19,7 @@ AWaterStream::AWaterStream()
     WaterEffect->SetupAttachment(RootComponent);
 }
 
-void AWaterStream::DeactivateStream()
+void AHardWaterStream::DeactivateStream()
 {
     // Desactiva la colisión para que el jugador pueda pasar
     BlockingCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);

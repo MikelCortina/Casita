@@ -1,4 +1,7 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Valve.generated.h"
@@ -16,7 +19,7 @@ protected:
 
     // Referencia al agua que controla esta llave — asígnala en el editor
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
-    TObjectPtr<class AWaterStream> LinkedWaterStream;
+    TObjectPtr<class AHardWaterStream> LinkedWaterStream;
 
     // Tecla de interacción — configúrala en Project Settings -> Input
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
