@@ -1,7 +1,4 @@
-// Grieta.h
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/FissureComponent.h"

@@ -1,5 +1,6 @@
 #include "Grieta.h"
 #include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Player/MainPlayer.h"
 
 AGrieta::AGrieta()
@@ -8,12 +9,14 @@ AGrieta::AGrieta()
 
     CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
     RootComponent = CollisionBox;
-
     CollisionBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
     CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AGrieta::OnOverlapBegin);
 
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     Mesh->SetupAttachment(RootComponent);
+    Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    FissureComponent = CreateDefaultSubobject<UFissureComponent>(TEXT("FissureComponent"));
 }
 
 void AGrieta::OnOverlapBegin(
@@ -30,7 +33,10 @@ void AGrieta::OnOverlapBegin(
     AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
     if (Player)
     {
-        // Solo la explosión de la grieta, sin tocar al jugador
+        // Resetea la gravedad del jugador sin activar sus partículas
+        Player->ResetGravity();
+
+        // Explosión de rosas de la grieta
         if (FissureComponent)
         {
             FissureComponent->SpawnParticleExplosion();
