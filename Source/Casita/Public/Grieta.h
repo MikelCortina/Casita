@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/FissureComponent.h"
 #include "Grieta.generated.h"
 
 UCLASS()
@@ -17,6 +18,9 @@ public:
 protected:
     UPROPERTY(VisibleAnywhere)
     class UBoxComponent* CollisionBox;
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UFissureComponent> FissureComponent;
 
     UPROPERTY(VisibleAnywhere)
     class UStaticMeshComponent* Mesh;
