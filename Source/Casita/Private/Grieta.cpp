@@ -27,17 +27,16 @@ void AGrieta::OnOverlapBegin(
 {
     if (bActivated) return;
 
-    if (OtherActor)
+    AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
+    if (Player)
     {
-        AMainPlayer* Player = Cast<AMainPlayer>(OtherActor); 
-
-        if (Player)
+        // Solo la explosión de la grieta, sin tocar al jugador
+        if (FissureComponent)
         {
-            Player->SetCheckpoint();
-
-            bActivated = true;
-
-            UE_LOG(LogTemp, Warning, TEXT("Checkpoint activado (Grieta)"));
+            FissureComponent->SpawnParticleExplosion();
         }
+
+        bActivated = true;
+        UE_LOG(LogTemp, Warning, TEXT("Grieta activada — explosión de rosas"));
     }
 }
