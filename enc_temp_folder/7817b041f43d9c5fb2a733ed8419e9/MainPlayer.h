@@ -45,7 +45,6 @@ public:
     float MoveSpeed = 600.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-
     float GravityFactor = 0.5f;
 
     void SetCameraIsMoving(bool bNewValue)
