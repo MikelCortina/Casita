@@ -7,6 +7,7 @@ class UBoxComponent;
 class UStaticMeshComponent;
 class UParticulasComponent;
 class UInstancedStaticMeshComponent;
+class AValve; 
 
 UCLASS()
 class CASITA_API AMainPlayer : public APawn
@@ -61,9 +62,14 @@ public:
 
     void ResetPlayerState();
     void SetCheckpoint();
-
-    // Resetea la gravedad sin activar partículas — llamado por AGrieta
     void ResetGravity();
+
+    UPROPERTY()
+    AValve* NearbyValve;
+
+    void SetNearbyValve(AValve* Valve) { NearbyValve = Valve; }
+    void ClearNearbyValve() { NearbyValve = nullptr; }
+    void TryInteractWithValve();
 
 private:
     float InputForward = 0.0f;
