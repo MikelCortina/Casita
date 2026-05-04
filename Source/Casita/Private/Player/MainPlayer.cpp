@@ -1,4 +1,5 @@
 #include "Player/MainPlayer.h"
+#include "WaterStream/Valve.h" 
 #include "Components/ParticulasComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/BoxComponent.h"
@@ -48,7 +49,6 @@ void AMainPlayer::Tick(float DeltaTime)
     FVector DeltaMovement = FVector::ZeroVector;
     bool bIsTryingToMove = (InputForward != 0.0f || InputRight != 0.0f);
 
-    // 1. MOVIMIENTO DE INPUT
     if (bIsTryingToMove)
     {
         APlayerController* PC = Cast<APlayerController>(GetController());
@@ -68,7 +68,6 @@ void AMainPlayer::Tick(float DeltaTime)
         }
     }
 
-    // 2. GRAVEDAD ACUMULATIVA
     if (bHasCheckpoint && bIsTryingToMove)
     {
         float CurrentDistance = FVector::Dist(GetActorLocation(), LastCheckpointLocation);
@@ -82,7 +81,6 @@ void AMainPlayer::Tick(float DeltaTime)
         DeltaMovement.Z -= VerticalFall;
     }
 
-    // 3. APLICAR MOVIMIENTO FINAL
     if (!DeltaMovement.IsNearlyZero())
     {
         FHitResult Hit;
@@ -98,7 +96,6 @@ void AMainPlayer::Tick(float DeltaTime)
         }
     }
 
-    // 4. GENERAR ESTELA
     float DistanceSinceLastTrail = FVector::Dist(GetActorLocation(), LastTrailLocation);
 
     if (DistanceSinceLastTrail >= SpawnTrailDistance)
@@ -125,6 +122,18 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     PlayerInputComponent->BindAxis("MoveForward", this, &AMainPlayer::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMainPlayer::MoveRight);
     PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::SetCheckpoint);
+
+    // NUEVO: Registro del input para interactuar
+    PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMainPlayer::TryInteractWithValve);
+}
+
+// NUEVO: Función que se ejecuta al pulsar la tecla de interactuar
+void AMainPlayer::TryInteractWithValve()
+{
+    if (NearbyValve)
+    {
+        NearbyValve->TryInteract();
+    }
 }
 
 void AMainPlayer::SetCheckpoint()

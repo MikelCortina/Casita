@@ -13,6 +13,7 @@ class CASITA_API AValve : public AActor
 
 public:
     AValve();
+    void TryInteract();
 
 protected:
     virtual void BeginPlay() override;
@@ -49,5 +50,5 @@ private:
         UPrimitiveComponent* OtherComp,
         int32 OtherBodyIndex);
 
-    void TryInteract();
+
 };
