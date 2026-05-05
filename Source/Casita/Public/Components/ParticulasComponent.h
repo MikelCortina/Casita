@@ -30,7 +30,7 @@ public:
 	float Cooldown = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
-	int32 MaxUses = 5;
+	int32 MaxUses = 10;
 
 	void ResetUses();
 	void SpawnParticles();

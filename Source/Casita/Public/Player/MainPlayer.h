@@ -55,10 +55,10 @@ public:
     }
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
-    int32 MaxCheckpointUses = 5;
+    int32 MaxCheckpointUses = 10;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
-    int32 RemainingCheckpoints = 5;
+    int32 RemainingCheckpoints = 10;
 
     void ResetPlayerState();
     void SetCheckpoint();

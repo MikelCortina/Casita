@@ -15,7 +15,7 @@ AValve::AValve()
 
     ProximityTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("ProximityTrigger"));
     ProximityTrigger->SetupAttachment(RootComponent);
-    ProximityTrigger->SetSphereRadius(150.0f);
+    ProximityTrigger->SetSphereRadius(10.0f);
     ProximityTrigger->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
     ProximityTrigger->OnComponentBeginOverlap.AddDynamic(this, &AValve::OnProximityBeginOverlap);
