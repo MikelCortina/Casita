@@ -17,6 +17,7 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+    virtual void Tick(float DeltaTime) override;
 
     // Referencia al agua que controla esta llave — asígnala en el editor
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
@@ -25,6 +26,12 @@ protected:
     // Tecla de interacción — configúrala en Project Settings -> Input
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
     FName InteractInputAction = TEXT("Interact");
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
+    float RotationSpeed = 180.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
+    float SpinDuration = 2.0f;
 
 private:
     UPROPERTY(VisibleAnywhere)
@@ -35,6 +42,8 @@ private:
 
     bool bPlayerInRange = false;
     bool bActivated = false;
+    bool bSpinning = false;
+    float SpinTimer = 0.f;
 
     UFUNCTION()
     void OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
