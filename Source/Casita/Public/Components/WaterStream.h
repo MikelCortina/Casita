@@ -6,6 +6,7 @@
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class CASITA_API AWaterStream : public AActor
@@ -26,6 +27,9 @@ public:
     // Componente visual (para que le pongas un material de agua semitransparente o partículas)
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UStaticMeshComponent* WaterVisualMesh;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UNiagaraComponent* LowWaterParticles;
 
     // Cuánto queremos multiplicar la gravedad mientras esté dentro
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Water Stream")
