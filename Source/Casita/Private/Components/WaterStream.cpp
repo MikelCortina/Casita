@@ -1,7 +1,7 @@
 #include "Components/WaterStream.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
-// ATENCIÓN: Asegúrate de que esta ruta coincida con la ubicación real de tu MainPlayer.h
+#include "NiagaraComponent.h"
 #include "Player/MainPlayer.h" 
 
 AWaterStream::AWaterStream()
@@ -27,6 +27,9 @@ AWaterStream::AWaterStream()
     // 3. Vincular los eventos de solapamiento a nuestras funciones
     TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AWaterStream::OnOverlapBegin);
     TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AWaterStream::OnOverlapEnd);
+
+    LowWaterParticles = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LowWaterParticles"));
+    LowWaterParticles->SetupAttachment(RootComponent);
 }
 
 void AWaterStream::BeginPlay()
