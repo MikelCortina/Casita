@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineComponent.h"
@@ -18,11 +18,24 @@ protected:
     virtual void Tick(float DeltaTime) override;
 
 public:
+
+    bool bAllowSplineRotation = true;
     void MoveToNextPoint();
     void ActivateCamera();
 
     void DisableInput();
     void EnableInput();
+
+    void MoveToFirstPoint();
+
+    bool bIntroMovement = false;
+
+    FVector IntroStartLocation;
+    FRotator IntroStartRotation;
+
+    FVector IntroTargetLocation;
+    FRotator IntroTargetRotation;
+
 
     bool IsCameraMoving() const { return bIsMoving; }
 
