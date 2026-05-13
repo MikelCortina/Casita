@@ -158,6 +158,7 @@ void AMainPlayer::SetCheckpoint()
     RemainingCheckpoints--;
 
     UE_LOG(LogTemp, Warning, TEXT("Checkpoint fijado. Quedan: %d usos."), RemainingCheckpoints);
+    UpdateUI();
 }
 
 void AMainPlayer::ResetGravity()

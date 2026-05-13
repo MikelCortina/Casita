@@ -36,6 +36,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Branch Trail")
     UInstancedStaticMeshComponent* InstancedTrailComponent;
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void UpdateUI();
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Branch Trail")
     float SpawnTrailDistance = 50.0f;
 
