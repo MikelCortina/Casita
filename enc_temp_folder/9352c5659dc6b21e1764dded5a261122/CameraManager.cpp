@@ -92,13 +92,17 @@ void ACameraManager::UpdateCameraOnSpline(float Alpha)
     float Distance = Alpha * CameraSpline->GetSplineLength();
 
     FVector NewPos = CameraSpline->GetLocationAtDistanceAlongSpline(
-        Distance, ESplineCoordinateSpace::Local);
+        Distance, ESplineCoordinateSpace::World);  // <-- World, no Local
 
     FRotator NewRot = CameraSpline->GetRotationAtDistanceAlongSpline(
-        Distance, ESplineCoordinateSpace::Local);
+        Distance, ESplineCoordinateSpace::World);  // <-- World, no Local
 
-    CameraComp->SetRelativeLocation(NewPos);
-    CameraComp->SetRelativeRotation(NewRot + FRotator(0, 0, 0));
+    SetActorLocation(NewPos);   // mover el ACTOR
+    SetActorRotation(NewRot);   // rotar el ACTOR
+
+    // La cámara queda en offset (0,0,0) relativo al actor
+    CameraComp->SetRelativeLocation(FVector::ZeroVector);
+    CameraComp->SetRelativeRotation(FRotator::ZeroRotator);
 }
 
 void ACameraManager::MoveToNextPoint()
