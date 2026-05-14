@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
 
 AMainPlayer::AMainPlayer()
@@ -122,9 +124,8 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     PlayerInputComponent->BindAxis("MoveForward", this, &AMainPlayer::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMainPlayer::MoveRight);
     PlayerInputComponent->BindAction("SpawnParticles", IE_Pressed, this, &AMainPlayer::SetCheckpoint);
-
-    // NUEVO: Registro del input para interactuar
     PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMainPlayer::TryInteractWithValve);
+    PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AMainPlayer::TogglePause);
 }
 
 // NUEVO: Función que se ejecuta al pulsar la tecla de interactuar
@@ -183,6 +184,38 @@ void AMainPlayer::ResetPlayerState()
     UE_LOG(LogTemp, Warning, TEXT("¡Estado del jugador reseteado en el nuevo portal!"));
 }
 
+void AMainPlayer::TogglePause()
+{
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (!PC || !PauseMenuClass) return;
+
+    if (!bIsPaused)
+    {
+        PauseMenuInstance = CreateWidget<UUserWidget>(PC, PauseMenuClass);
+        if (PauseMenuInstance)
+        {
+            PauseMenuInstance->AddToViewport();
+            PC->SetIgnoreMoveInput(true);
+            PC->SetIgnoreLookInput(true);
+            PC->bShowMouseCursor = true;
+            UGameplayStatics::SetGamePaused(GetWorld(), true);
+            bIsPaused = true;
+        }
+    }
+    else
+    {
+        if (PauseMenuInstance)
+        {
+            PauseMenuInstance->RemoveFromParent();
+            PauseMenuInstance = nullptr;
+        }
+        PC->SetIgnoreMoveInput(false);
+        PC->SetIgnoreLookInput(false);
+        PC->bShowMouseCursor = false;
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        bIsPaused = false;
+    }
+}
 void AMainPlayer::MoveForward(float Value) { InputForward = Value; }
 void AMainPlayer::MoveRight(float Value) { InputRight = Value; }
 void AMainPlayer::ActivateParticles() { if (ParticulasComponent) ParticulasComponent->SpawnParticles(); }

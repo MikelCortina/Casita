@@ -74,7 +74,14 @@ public:
     void ClearNearbyValve() { NearbyValve = nullptr; }
     void TryInteractWithValve();
 
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<UUserWidget> PauseMenuClass;
+
 private:
+    UUserWidget* PauseMenuInstance = nullptr;
+    bool bIsPaused = false;
+    void TogglePause();
+
     float InputForward = 0.0f;
     float InputRight = 0.0f;
     FVector LastCheckpointLocation;
