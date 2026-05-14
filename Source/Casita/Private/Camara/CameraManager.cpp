@@ -98,7 +98,7 @@ void ACameraManager::UpdateCameraOnSpline(float Alpha)
         Distance, ESplineCoordinateSpace::Local);
 
     CameraComp->SetRelativeLocation(NewPos);
-    CameraComp->SetRelativeRotation(NewRot + FRotator(0, 0, 0));
+    CameraComp->SetRelativeRotation(NewRot + FRotator(0, -90, 0));
 }
 
 void ACameraManager::MoveToNextPoint()
@@ -166,7 +166,7 @@ void ACameraManager::MoveToFirstPoint()
         return;
 
     // Posición inicial fija
-    FVector StartLocation = FVector(3650.f, -1750.f, 90.f);
+    FVector StartLocation = FVector(4000.f, 0.f, 700.f);
     FRotator StartRotation = FRotator(0.f, 0.f, 0.f);
 
     // Primera posición del spline
