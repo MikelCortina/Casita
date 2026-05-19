@@ -24,33 +24,46 @@ void ACameraManager::BeginPlay()
 
     CameraComp->Deactivate();
 
-    MoveToFirstPoint();
-
     CurrentPointIndex = 0;
+
+    // Colocar la cámara en el inicio del spline y arrancar la vuelta completa
+    UpdateCameraOnSpline(0.f);
+    StartSplineIntro();
 }
 
 void ACameraManager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    // --- FASE 1: Vuelta completa al spline al inicio ---
+    if (bSplineIntro)
+    {
+        SplineIntroElapsed += DeltaTime;
+
+        float T = FMath::Clamp(SplineIntroElapsed / SplineIntroDuration, 0.f, 1.f);
+        float EasedT = FMath::SmoothStep(0.f, 1.f, T);
+
+        UpdateCameraOnSpline(EasedT);
+
+        if (T >= 1.f)
+        {
+            bSplineIntro = false;
+            SplineIntroElapsed = 0.f;
+            UpdateCameraOnSpline(1.f);
+            EnableInput();
+        }
+        return;
+    }
+
+    // --- FASE 2: Intro desde posición fija al primer punto del spline ---
     if (bIntroMovement)
     {
         ElapsedTime += DeltaTime;
 
-        float T = FMath::Clamp(
-            ElapsedTime / TravelDuration,
-            0.f,
-            1.f);
+        float T = FMath::Clamp(ElapsedTime / TravelDuration, 0.f, 1.f);
 
-        FVector NewLocation = FMath::Lerp(
-            IntroStartLocation,
-            IntroTargetLocation,
-            T);
-
-        FRotator NewRotation = FMath::Lerp(
-            IntroStartRotation,
-            IntroTargetRotation,
-            T);
+        FVector NewLocation = FMath::Lerp(IntroStartLocation, IntroTargetLocation, T);
+        FRotator NewRotation = FMath::Lerp(IntroStartRotation, IntroTargetRotation, T);
 
         SetActorLocation(NewLocation);
         SetActorRotation(NewRotation);
@@ -59,14 +72,12 @@ void ACameraManager::Tick(float DeltaTime)
         {
             bIntroMovement = false;
             ElapsedTime = 0.f;
-
             EnableInput();
         }
-
         return;
     }
 
-
+    // --- FASE 3: Movimiento normal entre puntos del spline ---
     if (!bIsMoving) return;
 
     ElapsedTime += DeltaTime;
@@ -79,7 +90,6 @@ void ACameraManager::Tick(float DeltaTime)
     {
         bIsMoving = false;
         ElapsedTime = 0.0f;
-
         UpdateCameraOnSpline(SegmentAlphaEnd);
         EnableInput();
     }
@@ -99,6 +109,15 @@ void ACameraManager::UpdateCameraOnSpline(float Alpha)
 
     CameraComp->SetRelativeLocation(NewPos);
     CameraComp->SetRelativeRotation(NewRot + FRotator(0, -90, 0));
+}
+
+void ACameraManager::StartSplineIntro()
+{
+    SplineIntroElapsed = 0.f;
+    bSplineIntro = true;
+
+    ActivateCamera();
+    DisableInput();
 }
 
 void ACameraManager::MoveToNextPoint()
@@ -140,11 +159,10 @@ void ACameraManager::DisableInput()
 
     PC->SetIgnoreMoveInput(true);
     PC->SetIgnoreLookInput(true);
+
     AMainPlayer* MainPlayer = Cast<AMainPlayer>(PC->GetPawn());
     if (IsValid(MainPlayer))
-    {
         MainPlayer->SetCameraIsMoving(true);
-    }
 }
 
 void ACameraManager::EnableInput()
@@ -154,44 +172,32 @@ void ACameraManager::EnableInput()
 
     PC->SetIgnoreMoveInput(false);
     PC->SetIgnoreLookInput(false);
+
     AMainPlayer* MainPlayer = Cast<AMainPlayer>(PC->GetPawn());
     if (IsValid(MainPlayer))
-    {
         MainPlayer->SetCameraIsMoving(false);
-    }
 }
+
 void ACameraManager::MoveToFirstPoint()
 {
-    if (!CameraSpline || bIsMoving)
-        return;
+    if (!CameraSpline || bIsMoving) return;
 
-    // Posición inicial fija
     FVector StartLocation = FVector(4000.f, 0.f, 700.f);
     FRotator StartRotation = FRotator(0.f, 0.f, 0.f);
 
-    // Primera posición del spline
-    FVector FirstSplineLocation =
-        CameraSpline->GetLocationAtSplinePoint(
-            0,
-            ESplineCoordinateSpace::World);
+    FVector FirstSplineLocation = CameraSpline->GetLocationAtSplinePoint(
+        0, ESplineCoordinateSpace::World);
 
-    FRotator FirstSplineRotation =
-        CameraSpline->GetRotationAtSplinePoint(
-            0,
-            ESplineCoordinateSpace::World);
+    FRotator FirstSplineRotation = CameraSpline->GetRotationAtSplinePoint(
+        0, ESplineCoordinateSpace::World);
 
-    // Colocar cámara al inicio
-    SetActorRotation(FirstSplineRotation + FRotator(0, 0, 0));
     SetActorRotation(StartRotation);
 
-    // Guardar valores para interpolación
     IntroStartLocation = StartLocation;
     IntroStartRotation = StartRotation;
-
     IntroTargetLocation = FirstSplineLocation;
     IntroTargetRotation = FirstSplineRotation;
 
-    // Empezar movimiento
     ElapsedTime = 0.f;
     bIntroMovement = true;
 
