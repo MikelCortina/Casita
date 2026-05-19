@@ -16,6 +16,7 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+    virtual void OnConstruction(const FTransform& Transform) override;
 
 public:
     bool bAllowSplineRotation = true;
@@ -36,7 +37,7 @@ public:
 
     // Intro: vuelta completa al spline
     UPROPERTY(EditAnywhere, Category = "Intro")
-    float SplineIntroDuration = 5.f;
+    float SplineIntroDuration = 20.f;
 
     bool IsCameraMoving() const { return bIsMoving || bSplineIntro; }
 

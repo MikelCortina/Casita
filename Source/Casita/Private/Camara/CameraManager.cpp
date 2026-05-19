@@ -26,7 +26,6 @@ void ACameraManager::BeginPlay()
 
     CurrentPointIndex = 0;
 
-    // Colocar la cámara en el inicio del spline y arrancar la vuelta completa
     UpdateCameraOnSpline(0.f);
     StartSplineIntro();
 }
@@ -35,7 +34,6 @@ void ACameraManager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    // --- FASE 1: Vuelta completa al spline al inicio ---
     if (bSplineIntro)
     {
         SplineIntroElapsed += DeltaTime;
@@ -55,7 +53,6 @@ void ACameraManager::Tick(float DeltaTime)
         return;
     }
 
-    // --- FASE 2: Intro desde posición fija al primer punto del spline ---
     if (bIntroMovement)
     {
         ElapsedTime += DeltaTime;
@@ -77,7 +74,6 @@ void ACameraManager::Tick(float DeltaTime)
         return;
     }
 
-    // --- FASE 3: Movimiento normal entre puntos del spline ---
     if (!bIsMoving) return;
 
     ElapsedTime += DeltaTime;
@@ -203,4 +199,14 @@ void ACameraManager::MoveToFirstPoint()
 
     ActivateCamera();
     DisableInput();
+}
+
+void ACameraManager::OnConstruction(const FTransform& Transform)
+{
+    Super::OnConstruction(Transform);
+
+    if (!CameraSpline || CameraSpline->GetNumberOfSplinePoints() == 0)
+        return;
+
+    UpdateCameraOnSpline(0.f);
 }
