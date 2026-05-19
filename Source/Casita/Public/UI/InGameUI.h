@@ -12,7 +12,13 @@ class CASITA_API UInGameUI : public UUserWidget
 
 public:
     UFUNCTION(BlueprintCallable, Category = "UI")
+
     void ActualizarVisibilidadImagenes(int32 ImpulsosRestantes);
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void MostrarHUD();
+
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void OcultarHUD();
 
 protected:
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -38,4 +44,6 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     UTextBlock* TextBlock_133;
+
+
 };

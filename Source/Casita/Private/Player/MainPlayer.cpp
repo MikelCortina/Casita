@@ -41,6 +41,14 @@ void AMainPlayer::BeginPlay()
     bHasCheckpoint = true;
     LastTrailLocation = GetActorLocation();
     RemainingCheckpoints = MaxCheckpointUses;
+
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (PC && InGameUIClass)
+    {
+        InGameUIInstance = CreateWidget<UInGameUI>(PC, InGameUIClass);
+        if (InGameUIInstance)
+            InGameUIInstance->AddToViewport();
+    }
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -191,6 +199,9 @@ void AMainPlayer::TogglePause()
 
     if (!bIsPaused)
     {
+        if (InGameUIInstance)
+            InGameUIInstance->OcultarHUD();
+
         PauseMenuInstance = CreateWidget<UUserWidget>(PC, PauseMenuClass);
         if (PauseMenuInstance)
         {
@@ -209,6 +220,10 @@ void AMainPlayer::TogglePause()
             PauseMenuInstance->RemoveFromParent();
             PauseMenuInstance = nullptr;
         }
+
+        if (InGameUIInstance)
+            InGameUIInstance->MostrarHUD();
+
         PC->SetIgnoreMoveInput(false);
         PC->SetIgnoreLookInput(false);
         PC->bShowMouseCursor = false;
