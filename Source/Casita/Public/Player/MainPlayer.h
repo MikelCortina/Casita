@@ -39,7 +39,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Branch Trail")
     FVector TrailScale = FVector(0.5f, 0.5f, 0.5f);
-
+        
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float MoveSpeed = 600.0f;
 
