@@ -1,59 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Components/ParticulasComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 
-// Sets default values for this component's properties
 UParticulasComponent::UParticulasComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false; // No usamos Tick
-	UsesRemaining = MaxUses;
+    PrimaryComponentTick.bCanEverTick = false;
+    UsesRemaining = MaxUses;
 }
 
-
-// Called when the game starts
 void UParticulasComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+    Super::BeginPlay();
 }
 
 void UParticulasComponent::ResetUses()
 {
-	UsesRemaining = MaxUses;
+    UsesRemaining = MaxUses;
 }
 
-// Called every frame
 void UParticulasComponent::SpawnParticles()
 {
-	if (!ParticleSystem) return;
+    if (!ParticleSystem) return;
+    if (UsesRemaining <= 0) return;
 
-	if (UsesRemaining <= 0) return;
+    UWorld* World = GetWorld();
+    if (!World) return;
 
-	UWorld* World = GetWorld();
-	if (!World) return;
+    float CurrentTime = World->GetTimeSeconds();
+    if (CurrentTime - LastSpawnTime < Cooldown) return;
 
-	float CurrentTime = World->GetTimeSeconds();
+    AActor* Owner = GetOwner();
+    if (!Owner) return;
 
-	if (CurrentTime - LastSpawnTime < Cooldown) return;
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+        GetWorld(),
+        ParticleSystem,
+        Owner->GetActorLocation(),
+        Owner->GetActorRotation()
+    );
 
-	AActor* Owner = GetOwner();
-	if (!Owner) return;
-
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-		GetWorld(),
-		ParticleSystem,
-		Owner->GetActorLocation(),
-		Owner->GetActorRotation()
-	);
-
-	LastSpawnTime = CurrentTime;
-	UsesRemaining--;
+    LastSpawnTime = CurrentTime;
+    UsesRemaining--;
 }
-

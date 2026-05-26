@@ -1,5 +1,5 @@
 #include "Player/MainPlayer.h"
-#include "WaterStream/Valve.h" 
+#include "WaterStream/Valve.h"
 #include "Components/ParticulasComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/BoxComponent.h"
@@ -9,6 +9,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
+
+DEFINE_LOG_CATEGORY(LogPlayer);
 
 AMainPlayer::AMainPlayer()
 {
@@ -83,9 +85,7 @@ void AMainPlayer::Tick(float DeltaTime)
         float CurrentDistance = FVector::Dist(GetActorLocation(), LastCheckpointLocation);
 
         if (CurrentDistance > MaxDistanceReached)
-        {
             MaxDistanceReached = CurrentDistance;
-        }
 
         float VerticalFall = MaxDistanceReached * GravityFactor * DeltaTime;
         DeltaMovement.Z -= VerticalFall;
@@ -100,9 +100,7 @@ void AMainPlayer::Tick(float DeltaTime)
         {
             FVector SlideVector = FVector::VectorPlaneProject(DeltaMovement, Hit.Normal);
             if (SlideVector.Size() > 0.01f)
-            {
                 AddActorWorldOffset(SlideVector, true);
-            }
         }
     }
 
@@ -136,37 +134,38 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AMainPlayer::TogglePause);
 }
 
-// NUEVO: Función que se ejecuta al pulsar la tecla de interactuar
+void AMainPlayer::MoveForward(float Value) { InputForward = Value; }
+void AMainPlayer::MoveRight(float Value) { InputRight = Value; }
+void AMainPlayer::ActivateParticles() { if (ParticulasComponent) ParticulasComponent->SpawnParticles(); }
+
 void AMainPlayer::TryInteractWithValve()
 {
     if (NearbyValve)
-    {
         NearbyValve->TryInteract();
-    }
 }
 
 void AMainPlayer::SetCheckpoint()
 {
     if (bCameraMoving)
     {
-        UE_LOG(LogTemp, Warning, TEXT("No puedes usar partículas mientras la cámara se mueve."));
+        UE_LOG(LogPlayer, Warning, TEXT("No puedes usar particulas mientras la camara se mueve."));
         return;
     }
 
     if (RemainingCheckpoints <= 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("¡No te quedan más flores/checkpoints!"));
+        UE_LOG(LogPlayer, Warning, TEXT("No quedan mas flores/checkpoints."));
         return;
     }
 
-    if (ParticulasComponent) ParticulasComponent->SpawnParticles();
+    if (ParticulasComponent)
+        ParticulasComponent->SpawnParticles();
 
     LastCheckpointLocation = GetActorLocation();
     MaxDistanceReached = 0.0f;
     bHasCheckpoint = true;
     RemainingCheckpoints--;
 
-    UE_LOG(LogTemp, Warning, TEXT("Checkpoint fijado. Quedan: %d usos."), RemainingCheckpoints);
     UpdateUI();
 }
 
@@ -175,8 +174,6 @@ void AMainPlayer::ResetGravity()
     LastCheckpointLocation = GetActorLocation();
     MaxDistanceReached = 0.0f;
     bHasCheckpoint = true;
-
-    UE_LOG(LogTemp, Warning, TEXT("Gravedad reseteada por grieta"));
 }
 
 void AMainPlayer::ResetPlayerState()
@@ -188,8 +185,6 @@ void AMainPlayer::ResetPlayerState()
 
     if (ParticulasComponent)
         ParticulasComponent->ResetUses();
-
-    UE_LOG(LogTemp, Warning, TEXT("¡Estado del jugador reseteado en el nuevo portal!"));
 }
 
 void AMainPlayer::TogglePause()
@@ -231,6 +226,3 @@ void AMainPlayer::TogglePause()
         bIsPaused = false;
     }
 }
-void AMainPlayer::MoveForward(float Value) { InputForward = Value; }
-void AMainPlayer::MoveRight(float Value) { InputRight = Value; }
-void AMainPlayer::ActivateParticles() { if (ParticulasComponent) ParticulasComponent->SpawnParticles(); }

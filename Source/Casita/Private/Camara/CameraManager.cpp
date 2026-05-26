@@ -23,7 +23,6 @@ void ACameraManager::BeginPlay()
         return;
 
     CameraComp->Deactivate();
-
     CurrentPointIndex = 0;
 
     UpdateCameraOnSpline(0.f);
@@ -59,7 +58,7 @@ void ACameraManager::Tick(float DeltaTime)
 
         float T = FMath::Clamp(ElapsedTime / TravelDuration, 0.f, 1.f);
 
-        FVector NewLocation = FMath::Lerp(IntroStartLocation, IntroTargetLocation, T);
+        FVector  NewLocation = FMath::Lerp(IntroStartLocation, IntroTargetLocation, T);
         FRotator NewRotation = FMath::Lerp(IntroStartRotation, IntroTargetRotation, T);
 
         SetActorLocation(NewLocation);
@@ -124,7 +123,6 @@ void ACameraManager::MoveToNextPoint()
     if (CurrentPointIndex >= TotalPoints - 1) return;
 
     float SplineLength = CameraSpline->GetSplineLength();
-
     float DistStart = CameraSpline->GetDistanceAlongSplineAtSplinePoint(CurrentPointIndex);
     float DistEnd = CameraSpline->GetDistanceAlongSplineAtSplinePoint(CurrentPointIndex + 1);
 
@@ -178,7 +176,7 @@ void ACameraManager::MoveToFirstPoint()
 {
     if (!CameraSpline || bIsMoving) return;
 
-    FVector StartLocation = FVector(4000.f, 0.f, 700.f);
+    FVector  StartLocation = FVector(4000.f, 0.f, 700.f);
     FRotator StartRotation = FRotator(0.f, 0.f, 0.f);
 
     FVector FirstSplineLocation = CameraSpline->GetLocationAtSplinePoint(
