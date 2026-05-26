@@ -1,4 +1,3 @@
-// Valve.cpp
 #include "WaterStream/Valve.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
@@ -31,8 +30,20 @@ void AValve::BeginPlay()
 
 void AValve::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
+
+    if (!bSpinning) return;
+
+    AddActorLocalRotation(FRotator(0.f, RotationSpeed * DeltaTime, 0.f));
+    SpinTimer += DeltaTime;
+
+    if (SpinTimer >= SpinDuration)
+    {
+        bSpinning = false;
+        SpinTimer = 0.f;
+    }
 }
+
 
 void AValve::ShowInteractPrompt()
 {
@@ -43,9 +54,7 @@ void AValve::ShowInteractPrompt()
 
     InteractPromptWidget = CreateWidget<UUserWidget>(PC, InteractPromptClass);
     if (InteractPromptWidget)
-    {
         InteractPromptWidget->AddToViewport();
-    }
 }
 
 void AValve::HideInteractPrompt()
@@ -56,6 +65,7 @@ void AValve::HideInteractPrompt()
         InteractPromptWidget = nullptr;
     }
 }
+
 
 void AValve::TryInteract()
 {
@@ -68,9 +78,9 @@ void AValve::TryInteract()
     if (LinkedWaterStream)
     {
         LinkedWaterStream->DeactivateStream();
-        UE_LOG(LogTemp, Warning, TEXT("Llave girada — agua cerrada"));
     }
 }
+
 
 void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -94,4 +104,4 @@ void AValve::OnProximityEndOverlap(UPrimitiveComponent* OverlappedComp,
         Player->NearbyValve = nullptr;
         HideInteractPrompt();
     }
-}   
+}

@@ -1,6 +1,4 @@
-// Valve.h
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Valve.generated.h"
@@ -27,8 +25,23 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
     TObjectPtr<AHardWaterStream> LinkedWaterStream;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
+    float RotationSpeed = 180.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Valve")
+    float SpinDuration = 2.0f;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     TSubclassOf<UUserWidget> InteractPromptClass;
+
+    UPROPERTY(VisibleAnywhere)
+    UStaticMeshComponent* Mesh;
+
+    UPROPERTY(VisibleAnywhere)
+    USphereComponent* ProximityTrigger;
+
+    UPROPERTY(VisibleAnywhere)
+    UUserWidget* InteractPromptWidget;
 
     UFUNCTION()
     void OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
@@ -40,17 +53,7 @@ protected:
         AActor* OtherActor, UPrimitiveComponent* OtherComp,
         int32 OtherBodyIndex);
 
-    UPROPERTY(VisibleAnywhere)
-    UStaticMeshComponent* Mesh;
-
-    UPROPERTY(VisibleAnywhere)
-    USphereComponent* ProximityTrigger;
-
-    UPROPERTY(VisibleAnywhere)
-	UUserWidget* InteractPromptWidget;
-
 private:
-
     bool bPlayerInRange = false;
     bool bActivated = false;
     bool bSpinning = false;
