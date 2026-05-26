@@ -4,8 +4,6 @@
 #include "Components/SceneComponent.h"
 #include "AbsorptionComponent.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogAbsorptionComponent, Log, All);
-
 class UNiagaraSystem;
 class UNiagaraComponent;
 

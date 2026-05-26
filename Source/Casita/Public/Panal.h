@@ -4,6 +4,7 @@
 #include "Components/FissureComponent.h"
 #include "Panal.generated.h"
 
+
 UCLASS()
 class CASITA_API APanal : public AActor
 {

@@ -43,6 +43,6 @@ void AGrieta::OnOverlapBegin(
         }
 
         bActivated = true;
-        UE_LOG(LogGrieta, Warning, TEXT("Grieta activada — explosión de rosas"));
+        UE_LOG(LogTemp, Warning, TEXT("Grieta activada — explosión de rosas"));
     }
 }

@@ -4,9 +4,6 @@
 #include "GameFramework/Actor.h"
 #include "WaterStream.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogWaterStream, Log, All);
-
-
 class UBoxComponent;
 class UStaticMeshComponent;
 class UNiagaraComponent;

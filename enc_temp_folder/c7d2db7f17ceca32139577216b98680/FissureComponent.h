@@ -6,8 +6,6 @@
 #include "NiagaraSystem.h"
 #include "FissureComponent.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogFissureComponent, Log, All);
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CASITA_API UFissureComponent : public UActorComponent
 {

@@ -26,7 +26,7 @@ void UFissureComponent::BeginPlay()
     }
     else
     {
-        UE_LOG(LogFissureComponent, Warning,
+        UE_LOG(LogTemp, Warning,
             TEXT("FissureComponent: El Actor '%s' no tiene BoxComponent. "
                 "Añade uno para que funcione el trigger."),
             *GetOwner()->GetName());
@@ -51,7 +51,7 @@ void UFissureComponent::OnTriggerBeginOverlap(
     // DEBUG temporal
     if (OtherActor)
     {
-        UE_LOG(LogFissureComponent, Warning, TEXT("Overlap detectado con: %s"), *OtherActor->GetName());
+        UE_LOG(LogTemp, Warning, TEXT("Overlap detectado con: %s"), *OtherActor->GetName());
     }
 
     if (!OtherActor || !OtherActor->IsA<APawn>() || bOnCooldown)

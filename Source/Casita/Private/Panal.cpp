@@ -6,7 +6,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Player/MainPlayer.h"
 
-// Sets default values
 APanal::APanal()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -36,16 +35,13 @@ void APanal::OnOverlapBegin(
     AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
     if (Player)
     {
-        // Resetea la gravedad del jugador sin activar sus partículas
         Player->ResetGravity();
 
-        // Explosión de rosas de la grieta
         if (FissureComponent)
         {
             FissureComponent->SpawnParticleExplosion();
         }
 
         bActivated = true;
-        UE_LOG(LogTemp, Warning, TEXT("Panal activada — explosión de rosas"));
     }
 }

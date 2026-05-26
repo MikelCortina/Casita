@@ -4,8 +4,6 @@
 #include "Components/FissureComponent.h"
 #include "Grieta.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogGrieta, Log, All);
-
 UCLASS()
 class CASITA_API AGrieta : public AActor
 {

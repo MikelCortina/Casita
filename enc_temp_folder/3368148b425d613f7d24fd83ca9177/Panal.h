@@ -2,17 +2,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/FissureComponent.h"
-#include "Grieta.generated.h"
-
-DECLARE_LOG_CATEGORY_EXTERN(LogGrieta, Log, All);
+#include "Panal.generated.h"
 
 UCLASS()
-class CASITA_API AGrieta : public AActor
+class CASITA_API APanal : public AActor
 {
     GENERATED_BODY()
 
 public:
-    AGrieta();
+    APanal();
 
 protected:
     UPROPERTY(VisibleAnywhere)

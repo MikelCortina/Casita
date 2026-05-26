@@ -7,7 +7,6 @@
 #include "NiagaraSystem.h"
 #include "HardWaterStream.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogHardWaterStream, Log, All);
 UCLASS()
 class CASITA_API AHardWaterStream : public AActor
 {

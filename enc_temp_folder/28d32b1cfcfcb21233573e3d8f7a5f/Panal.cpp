@@ -1,16 +1,20 @@
-#include "Grieta.h"
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Panal.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Player/MainPlayer.h"
 
-AGrieta::AGrieta()
+// Sets default values
+APanal::APanal()
 {
     PrimaryActorTick.bCanEverTick = false;
 
     CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
     RootComponent = CollisionBox;
     CollisionBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
-    CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AGrieta::OnOverlapBegin);
+    CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &APanal::OnOverlapBegin);
 
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     Mesh->SetupAttachment(RootComponent);
@@ -18,8 +22,7 @@ AGrieta::AGrieta()
 
     FissureComponent = CreateDefaultSubobject<UFissureComponent>(TEXT("FissureComponent"));
 }
-
-void AGrieta::OnOverlapBegin(
+void APanal::OnOverlapBegin(
     UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor,
     UPrimitiveComponent* OtherComp,
@@ -43,6 +46,6 @@ void AGrieta::OnOverlapBegin(
         }
 
         bActivated = true;
-        UE_LOG(LogGrieta, Warning, TEXT("Grieta activada — explosión de rosas"));
+        UE_LOG(LogTemp, Warning, TEXT("Panal activada — explosión de rosas"));
     }
 }

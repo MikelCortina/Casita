@@ -3,8 +3,6 @@
 #include "Components/SceneComponent.h"
 #include "PortalComponent.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogPortalComponent, Log, All);
-
 class UNiagaraSystem;
 class UNiagaraComponent;
 
@@ -32,9 +30,14 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Portal FX")
     UNiagaraComponent* AbsorptionFXComponent;
 
+    // --- Portal permanente ---
     void ActivatePortal();
     void DeactivatePortal();
+
+    // --- Absorción ---
     void ActivateAbsorption();
     void DeactivateAbsorption();
+
+    // --- Limpieza final ---
     void DestroyFX();
 };
