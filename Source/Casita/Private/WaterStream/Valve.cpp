@@ -76,9 +76,10 @@ void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor, UPrimitiveComponent* OtherComp,
     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (Cast<AMainPlayer>(OtherActor))
+    if (AMainPlayer* Player = Cast<AMainPlayer>(OtherActor))
     {
         bPlayerInRange = true;
+        Player->NearbyValve = this;
         ShowInteractPrompt();
     }
 }
@@ -87,9 +88,10 @@ void AValve::OnProximityEndOverlap(UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor, UPrimitiveComponent* OtherComp,
     int32 OtherBodyIndex)
 {
-    if (Cast<AMainPlayer>(OtherActor))
+    if (AMainPlayer* Player = Cast<AMainPlayer>(OtherActor))
     {
         bPlayerInRange = false;
+        Player->NearbyValve = nullptr;
         HideInteractPrompt();
     }
 }   
