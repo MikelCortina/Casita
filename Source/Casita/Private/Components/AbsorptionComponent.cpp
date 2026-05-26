@@ -2,6 +2,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 
+DEFINE_LOG_CATEGORY(LogAbsorptionComponent);
+
 UAbsorptionComponent::UAbsorptionComponent()
 {
     PrimaryComponentTick.bCanEverTick = false; 

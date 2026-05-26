@@ -3,6 +3,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 
+
 UPortalComponent::UPortalComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;

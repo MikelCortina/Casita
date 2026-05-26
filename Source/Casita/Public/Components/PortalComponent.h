@@ -3,7 +3,6 @@
 #include "Components/SceneComponent.h"
 #include "PortalComponent.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogPortalComponent, Log, All);
 
 class UNiagaraSystem;
 class UNiagaraComponent;

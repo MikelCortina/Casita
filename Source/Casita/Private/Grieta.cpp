@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Player/MainPlayer.h"
 
+
 AGrieta::AGrieta()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -33,16 +34,13 @@ void AGrieta::OnOverlapBegin(
     AMainPlayer* Player = Cast<AMainPlayer>(OtherActor);
     if (Player)
     {
-        // Resetea la gravedad del jugador sin activar sus partículas
         Player->ResetGravity();
 
-        // Explosión de rosas de la grieta
         if (FissureComponent)
         {
             FissureComponent->SpawnParticleExplosion();
         }
 
         bActivated = true;
-        UE_LOG(LogGrieta, Warning, TEXT("Grieta activada — explosión de rosas"));
     }
 }

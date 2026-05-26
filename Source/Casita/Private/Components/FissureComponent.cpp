@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
 
+DEFINE_LOG_CATEGORY(LogFissureComponent);
+
 UFissureComponent::UFissureComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;

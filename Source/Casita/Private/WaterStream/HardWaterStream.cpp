@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 
+
 AHardWaterStream::AHardWaterStream()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -24,6 +25,5 @@ void AHardWaterStream::DeactivateStream()
     if (WaterEffect)
         WaterEffect->Deactivate();
 
-    UE_LOG(LogHardWaterStream, Warning, TEXT("Corriente de agua desactivada"));
 }
 

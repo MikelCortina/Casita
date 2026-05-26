@@ -4,6 +4,8 @@
 #include "NiagaraComponent.h"
 #include "Player/MainPlayer.h" 
 
+DEFINE_LOG_CATEGORY(LogWaterStream);
+
 AWaterStream::AWaterStream()
 {
     PrimaryActorTick.bCanEverTick = false; 
