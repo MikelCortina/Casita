@@ -18,3 +18,13 @@ void UInGameUI::ActualizarVisibilidadImagenes(int32 ImpulsosRestantes)
         }
     }
 }
+
+void UInGameUI::MostrarHUD()
+{
+    SetVisibility(ESlateVisibility::Visible);
+}
+
+void UInGameUI::OcultarHUD()
+{
+    SetVisibility(ESlateVisibility::Hidden);
+}

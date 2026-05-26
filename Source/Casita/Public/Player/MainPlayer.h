@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "UI/InGameUI.h"
 #include "MainPlayer.generated.h"
 
 class UBoxComponent;
@@ -77,6 +78,9 @@ public:
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<UUserWidget> PauseMenuClass;
 
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<UUserWidget> InGameUIClass;
+
 private:
     UUserWidget* PauseMenuInstance = nullptr;
     bool bIsPaused = false;
@@ -93,4 +97,6 @@ private:
     void MoveForward(float Value);
     void MoveRight(float Value);
     void ActivateParticles();
+
+    UInGameUI* InGameUIInstance = nullptr;
 };
