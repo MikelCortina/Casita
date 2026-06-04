@@ -3,11 +3,12 @@
 #include "Components/SphereComponent.h"
 #include "Player/MainPlayer.h"
 #include "WaterStream/HardWaterStream.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
 
 AValve::AValve()
 {
-    PrimaryActorTick.bCanEverTick = true;  
+    PrimaryActorTick.bCanEverTick = true;
 
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     RootComponent = Mesh;
@@ -34,29 +35,52 @@ void AValve::Tick(float DeltaTime)
     if (!bSpinning) return;
 
     AddActorLocalRotation(FRotator(0.f, RotationSpeed * DeltaTime, 0.f));
-
     SpinTimer += DeltaTime;
+
     if (SpinTimer >= SpinDuration)
     {
         bSpinning = false;
         SpinTimer = 0.f;
-        UE_LOG(LogTemp, Warning, TEXT("Válvula deja de girar"));
     }
 }
+
+
+void AValve::ShowInteractPrompt()
+{
+    if (InteractPromptWidget || !InteractPromptClass) return;
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC) return;
+
+    InteractPromptWidget = CreateWidget<UUserWidget>(PC, InteractPromptClass);
+    if (InteractPromptWidget)
+        InteractPromptWidget->AddToViewport();
+}
+
+void AValve::HideInteractPrompt()
+{
+    if (InteractPromptWidget)
+    {
+        InteractPromptWidget->RemoveFromParent();
+        InteractPromptWidget = nullptr;
+    }
+}
+
 
 void AValve::TryInteract()
 {
     if (!bPlayerInRange || bActivated) return;
 
     bActivated = true;
-    bSpinning = true;   
+    bSpinning = true;
+    HideInteractPrompt();
 
     if (LinkedWaterStream)
     {
         LinkedWaterStream->DeactivateStream();
-        UE_LOG(LogTemp, Warning, TEXT("Llave girada — agua cerrada"));
     }
 }
+
 
 void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -65,8 +89,8 @@ void AValve::OnProximityBeginOverlap(UPrimitiveComponent* OverlappedComp,
     if (AMainPlayer* Player = Cast<AMainPlayer>(OtherActor))
     {
         bPlayerInRange = true;
-        Player->SetNearbyValve(this);
-        UE_LOG(LogTemp, Warning, TEXT("Jugador cerca de la llave — pulsa Interact"));
+        Player->NearbyValve = this;
+        ShowInteractPrompt();
     }
 }
 
@@ -77,6 +101,7 @@ void AValve::OnProximityEndOverlap(UPrimitiveComponent* OverlappedComp,
     if (AMainPlayer* Player = Cast<AMainPlayer>(OtherActor))
     {
         bPlayerInRange = false;
-        Player->ClearNearbyValve();
+        Player->NearbyValve = nullptr;
+        HideInteractPrompt();
     }
 }
